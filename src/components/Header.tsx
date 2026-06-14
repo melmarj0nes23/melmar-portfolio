@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Search, Bell, MessageCircle, Menu, X, Sparkles, MapPin, 
   GraduationCap, Github, Linkedin, Facebook, Mail, ExternalLink, Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Post } from '../types';
 
 interface HeaderProps {
   userName: string;
@@ -17,6 +18,7 @@ interface HeaderProps {
   userEmail?: string;
   visitorCount?: number;
   visitorOrdinal?: number;
+  posts?: Post[];
 }
 
 function getOrdinalSuffix(i: number) {
@@ -45,21 +47,114 @@ export default function Header({
   userFacebook = 'https://facebook.com/melmarj0nes23',
   userEmail = 'mailto:melmarjvelasco@gmail.com',
   visitorCount = 1,
-  visitorOrdinal = 1
+  visitorOrdinal = 1,
+  posts = []
 }: HeaderProps) {
   const [showGreeting, setShowGreeting] = useState(false);
   const [isMessengerOpen, setIsMessengerOpen] = useState(false);
   const [isVisitorPopupOpen, setIsVisitorPopupOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Search states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Filter posts based on query
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+    if (!searchQuery.trim()) return posts;
+    
+    const query = searchQuery.toLowerCase();
+    return posts.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.tags.some(tag => tag.toLowerCase().includes(query))
+    );
+  }, [posts, searchQuery]);
+
+  // Extract all URLs from all posts
+  const liveProjects = useMemo(() => {
+    if (!posts) return [];
+    const list: { id: string; title: string; urls: string[] }[] = [];
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+    
+    posts.forEach(post => {
+      if (!post.description) return;
+      const matches = post.description.match(urlRegex);
+      if (matches && matches.length > 0) {
+        // Deduplicate and resolve protocols, strip trailing formatting
+        const uniqueUrls = Array.from(new Set(matches.map(m => {
+          let cleaned = m;
+          while (/[.,;:)]+$/.test(cleaned)) {
+            cleaned = cleaned.slice(0, -1);
+          }
+          return cleaned.toLowerCase().startsWith('http') ? cleaned : `https://${cleaned}`;
+        })));
+        if (uniqueUrls.length > 0) {
+          list.push({
+            id: post.id,
+            title: post.title,
+            urls: uniqueUrls,
+          });
+        }
+      }
+    });
+    return list;
+  }, [posts]);
+
+  // Click outside listener for the search dropdown and the menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSelectPost = (postId: string, title: string) => {
+    setSearchQuery(title);
+    setIsDropdownOpen(false);
+
+    // Jump straight to that specific project card
+    const element = document.getElementById(`post-${postId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Temporary high contrast highlighting border
+      element.classList.remove('ring-4', 'ring-blue-500/50');
+      element.classList.add('ring-4', 'ring-blue-500/50', 'transition-all', 'duration-300');
+      
+      setTimeout(() => {
+        element.classList.remove('ring-4', 'ring-blue-500/50');
+      }, 1800);
+    }
+  };
 
   // Close other overlays when opening one
   const handleToggleMessenger = () => {
     setIsMessengerOpen(!isMessengerOpen);
     setIsVisitorPopupOpen(false);
+    setIsMenuOpen(false);
   };
 
   const handleToggleVisitor = () => {
     setIsVisitorPopupOpen(!isVisitorPopupOpen);
     setIsMessengerOpen(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    setIsMessengerOpen(false);
+    setIsVisitorPopupOpen(false);
   };
 
   return (
@@ -89,15 +184,73 @@ export default function Header({
       </div>
 
       {/* Center section: Search bar */}
-      <div className="flex-grow flex justify-center max-w-[200px] xs:max-w-[260px] sm:max-w-[340px] md:max-w-[440px] mx-2">
+      <div 
+        ref={searchRef} 
+        className="flex-grow flex justify-center max-w-[200px] xs:max-w-[260px] sm:max-w-[340px] md:max-w-[440px] mx-2 relative"
+      >
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
             placeholder="Search Projects"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsDropdownOpen(true)}
             className="w-full h-9 pl-9 pr-4 bg-white/10 text-white placeholder-white/70 rounded-full focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 text-sm transition-all border border-transparent focus:border-blue-300"
-            disabled
           />
+
+          {/* Search Dropdown / Autocomplete Recommendations */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-11 left-0 right-0 max-h-64 sm:max-h-80 bg-white rounded-lg shadow-xl border border-gray-200 overflow-y-auto z-[999] text-gray-800 text-sm flex flex-col"
+              >
+                {filteredPosts.length > 0 ? (
+                  <div className="py-1">
+                    <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold text-gray-400 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                      <span>Projects ({filteredPosts.length})</span>
+                      {searchQuery && (
+                        <button 
+                          type="button" 
+                          onClick={() => setSearchQuery('')}
+                          className="hover:text-blue-500 font-semibold cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    {filteredPosts.map((post) => (
+                      <button
+                        key={post.id}
+                        type="button"
+                        onClick={() => handleSelectPost(post.id, post.title)}
+                        className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors flex flex-col border-b border-gray-50 last:border-0 cursor-pointer"
+                      >
+                        <span className="font-semibold text-gray-800 line-clamp-1">{post.title}</span>
+                        {post.tags && post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-0.5">
+                            {post.tags.slice(0, 3).map((tag, idx) => (
+                              <span key={idx} className="text-[10px] text-gray-400 bg-gray-100 px-1 rounded">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-400 text-xs italic">
+                    No matching projects found
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -253,12 +406,78 @@ export default function Header({
         </div>
 
         {/* 3. Burger / Menu Icon (Targeted: RIGHT MOST SIDE) */}
-        <button 
-          className="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors relative cursor-pointer" 
-          title="Sidebar Menu Trigger"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        <div className="relative" ref={menuRef}>
+          <button 
+            type="button"
+            onClick={handleToggleMenu}
+            className={`w-9 h-9 text-white rounded-full flex items-center justify-center transition-all relative cursor-pointer ${isMenuOpen ? 'bg-white/25 scale-95 shadow-inner' : 'bg-white/10 hover:bg-white/20'}`} 
+            title="Live Projects Menu Trigger"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* Live Projects Dropdown / Panel */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-150 overflow-hidden z-[999] text-gray-800 flex flex-col"
+              >
+                <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Live Links Menu</span>
+                  <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Live URLs</span>
+                </div>
+
+                <div className="p-4 flex flex-col">
+                  <h4 className="text-xs font-bold text-gray-700 mb-3 flex items-center gap-1.5 border-b border-gray-100 pb-2">
+                    <span className="text-blue-600 font-bold">🚀</span> Visit my live projects:
+                  </h4>
+
+                  {liveProjects.length > 0 ? (
+                    <div className="flex flex-col gap-3 max-h-72 overflow-y-auto pr-1">
+                      {liveProjects.map((proj) => (
+                        <div key={proj.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-150 hover:border-blue-200 transition-colors flex flex-col gap-1.5">
+                          <button 
+                            type="button" 
+                            onClick={() => handleSelectPost(proj.id, proj.title)}
+                            className="text-left font-bold text-gray-900 text-xs hover:text-blue-600 hover:underline transition-colors focus:outline-none cursor-pointer"
+                          >
+                            {proj.title}
+                          </button>
+                          
+                          <div className="flex flex-col gap-1 pl-1">
+                            {proj.urls.map((url, uidx) => (
+                              <a
+                                key={uidx}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-[#1877f2] hover:underline font-medium flex items-center gap-1.5 break-all"
+                              >
+                                <span className="text-[10px] text-gray-400">🌐</span>
+                                <span className="flex-grow">{url}</span>
+                                <ExternalLink className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-6 text-center text-gray-400 gap-2">
+                      <span className="text-xl">🔗</span>
+                      <p className="text-xs">No live website links found in current projects.</p>
+                      <p className="text-[10px] max-w-[200px]">Add links starting with http://, https://, or www. in your description logs to display them here!</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Greeting Modal Overlay */}
