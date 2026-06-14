@@ -64,12 +64,33 @@ export default function Header({
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-[#1877f2] shadow-md z-50 flex items-center justify-between px-4" id="fb-header">
-      {/* Left section: Logo and Search */}
-      <div className="flex items-center gap-2 flex-grow max-w-[320px]">
-        <div className="bg-white text-[#1877f2] w-10 h-10 rounded-full flex items-center justify-center font-bold text-2xl tracking-tighter select-none shadow">
-          f
+      {/* Left-most section: Profile Badge / Avatar */}
+      <div className="flex items-center flex-shrink-0">
+        <div 
+          onClick={() => {
+            setShowGreeting(true);
+            setIsMessengerOpen(false);
+            setIsVisitorPopupOpen(false);
+          }}
+          className="flex items-center gap-2 hover:bg-white/15 active:scale-98 px-2 py-1 rounded-full cursor-pointer transition-all text-white"
+          title="About Melmar"
+          id="header-user-badge"
+        >
+          <img
+            src={userAvatar}
+            alt={userName}
+            className="w-8 h-8 rounded-full border border-white/30 object-cover shadow-sm"
+            referrerPolicy="no-referrer"
+          />
+          <span className="text-sm font-semibold hidden sm:inline whitespace-nowrap hover:underline select-none">
+            {userName.split(' ')[0]}
+          </span>
         </div>
-        <div className="relative flex-grow">
+      </div>
+
+      {/* Center section: Search bar */}
+      <div className="flex-grow flex justify-center max-w-[200px] xs:max-w-[260px] sm:max-w-[340px] md:max-w-[440px] mx-2">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -80,28 +101,8 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right section: Profile Badge and Utility Icons with precise right-most Burger placement */}
-      <div className="flex items-center gap-2 relative">
-        <div 
-          onClick={() => {
-            setShowGreeting(true);
-            setIsMessengerOpen(false);
-            setIsVisitorPopupOpen(false);
-          }}
-          className="flex items-center gap-2 hover:bg-white/15 active:scale-98 px-3 py-1 rounded-full cursor-pointer transition-all text-white mr-2"
-          title="About Melmar"
-          id="header-user-badge"
-        >
-          <img
-            src={userAvatar}
-            alt={userName}
-            className="w-7 h-7 rounded-full border border-white/30 object-cover shadow-sm"
-            referrerPolicy="no-referrer"
-          />
-          <span className="text-sm font-semibold hidden sm:inline whitespace-nowrap hover:underline select-none">
-            {userName.split(' ')[0]}
-          </span>
-        </div>
+      {/* Right section: Utility Icons and Burger menu */}
+      <div className="flex items-center gap-1.5 sm:gap-2 relative flex-shrink-0">
 
         {/* 1. Messenger/Interactivity Hub Icon */}
         <div className="relative">

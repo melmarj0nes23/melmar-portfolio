@@ -194,6 +194,8 @@ export default function App() {
   const [isOwnerMode, setIsOwnerMode] = useState<boolean>(() => {
     return localStorage.getItem('fb_portfolio_owner_mode') === 'true';
   });
+  const [passcodeError, setPasscodeError] = useState<string | null>(null);
+  const [showPasscodeForm, setShowPasscodeForm] = useState<boolean>(false);
 
   // Sync profile details cache
   const handleUpdateBio = (newBio: string) => {
@@ -458,73 +460,107 @@ export default function App() {
           onUpdateCoverPhoto={handleUpdateCoverPhoto}
         />
 
-        {/* Owner Verification Console */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-5xl mx-auto w-full shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-sm">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${isOwnerMode ? 'bg-[#1877f2] animate-pulse' : 'bg-gray-400'}`}></span>
-            <span className="text-gray-700 text-xs font-semibold uppercase tracking-wider">
-              {isOwnerMode ? (
-                <span className="flex items-center gap-1.5 text-blue-700 font-bold font-sans">
-                  <ShieldCheck className="w-4 h-4 text-[#1877f2]" /> Melmar Mode Active (Owner Account)
-                </span>
-              ) : (
-                <span className="text-[12px] font-sans font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200/60 inline-flex items-center gap-1">
-                  You are on read-only mode
-                </span>
-              )}
-            </span>
-          </div>
+        {/* Owner Verification Console - Hidden by default, toggled via Node.js badge or shown active */}
+        {(isOwnerMode || showPasscodeForm) && (
+          <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-5xl mx-auto w-full shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-sm">
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${isOwnerMode ? 'bg-[#1877f2] animate-pulse' : 'bg-gray-400'}`}></span>
+              <span className="text-gray-700 text-xs font-semibold uppercase tracking-wider">
+                {isOwnerMode ? (
+                  <span className="flex items-center gap-1.5 text-blue-700 font-bold font-sans">
+                    <ShieldCheck className="w-4 h-4 text-[#1877f2]" /> Melmar Mode Active (Owner Account)
+                  </span>
+                ) : (
+                  <span className="text-[12px] font-sans font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/60 inline-flex items-center gap-1">
+                    Passcode Verification Required
+                  </span>
+                )}
+              </span>
+            </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto sm:justify-end">
-            {isOwnerMode ? (
-              <div className="flex items-center gap-3 w-full justify-between sm:justify-end">
-                <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-150 font-bold flex items-center gap-1">
-                  <Unlock className="w-3.5 h-3.5 text-green-600" /> Fully Authorized
-                </span>
-                <button
-                  onClick={() => {
-                    setIsOwnerMode(false);
-                    localStorage.setItem('fb_portfolio_owner_mode', 'false');
-                  }}
-                  className="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded text-xs font-semibold transition-all whitespace-nowrap"
-                >
-                  Log Out Owner
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const form = e.currentTarget;
-                  const input = form.elements.namedItem('ownerPasscode') as HTMLInputElement;
-                  if (input.value === 'A@11111a') {
-                    setIsOwnerMode(true);
-                    localStorage.setItem('fb_portfolio_owner_mode', 'true');
-                    input.value = '';
-                  } else {
-                    alert('Invalid Passcode! Try "A@11111a" to login.');
-                  }
-                }}
-                className="flex items-center gap-1.5 w-full sm:w-auto"
-              >
-                <Key className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                <input
-                  name="ownerPasscode"
-                  type="password"
-                  id="passcode-input"
-                  placeholder="Melmar's Passcode (hint: A@11111a)"
-                  className="bg-gray-50 border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-700 focus:outline-[#1877f2] flex-grow sm:w-48"
-                />
-                <button
-                  type="submit"
-                  className="px-3 py-1 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded text-xs font-semibold shadow transition-colors whitespace-nowrap"
-                >
-                  Verify Owner
-                </button>
-              </form>
-            )}
+            <div className="flex items-center gap-2.5 w-full sm:w-auto sm:justify-end">
+              {isOwnerMode ? (
+                <div className="flex items-center gap-3 w-full justify-between sm:justify-end">
+                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-150 font-bold flex items-center gap-1">
+                    <Unlock className="w-3.5 h-3.5 text-green-600" /> Fully Authorized
+                  </span>
+                  <button
+                    onClick={() => {
+                      setIsOwnerMode(false);
+                      localStorage.setItem('fb_portfolio_owner_mode', 'false');
+                    }}
+                    className="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded text-xs font-semibold transition-all whitespace-nowrap"
+                  >
+                    Log Out Owner
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                  {passcodeError && (
+                    <span className="text-red-500 text-xs font-medium animate-pulse" id="passcode-error">
+                      {passcodeError}
+                    </span>
+                  )}
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setPasscodeError(null);
+                      const form = e.currentTarget;
+                      const input = form.elements.namedItem('ownerPasscode') as HTMLInputElement;
+                      const val = input.value;
+                      if (!val) return;
+
+                      let isValid = false;
+                      const customPasscode = (import.meta as any).env?.VITE_OWNER_PASSCODE;
+
+                      if (customPasscode) {
+                        isValid = (val === customPasscode);
+                      } else {
+                        try {
+                          const msgBuffer = new TextEncoder().encode(val);
+                          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                          const hashArray = Array.from(new Uint8Array(hashBuffer));
+                          const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                          // Matches 'A@11111a' anonymously
+                          isValid = (hashHex === '81575fd9e7be6a8cfc797b84c72c19889164b80aae49426824e5829f5f598174');
+                        } catch (err) {
+                          // Standard fallback
+                          isValid = false;
+                        }
+                      }
+
+                      if (isValid) {
+                        setIsOwnerMode(true);
+                        localStorage.setItem('fb_portfolio_owner_mode', 'true');
+                        setShowPasscodeForm(false);
+                        input.value = '';
+                      } else {
+                        setPasscodeError('Invalid passcode!');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 w-full sm:w-auto"
+                  >
+                    <Key className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <input
+                      name="ownerPasscode"
+                      type="password"
+                      id="passcode-input"
+                      placeholder="Owner's passcode"
+                      onChange={() => setPasscodeError(null)}
+                      className="bg-gray-50 border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-700 focus:outline-[#1877f2] flex-grow sm:w-44"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-1 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded text-xs font-semibold shadow transition-colors whitespace-nowrap cursor-pointer"
+                    >
+                      Verify Owner
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Two-Column Workspace Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-5xl w-full mx-auto">
@@ -535,17 +571,18 @@ export default function App() {
               profile={profile} 
               posts={posts} 
               onPhotoClick={(index, photos) => setActiveLightbox({ urls: photos, index })}
+              onSkillClick={(skill) => {
+                if (skill === 'Node.js') {
+                  setShowPasscodeForm(prev => !prev);
+                }
+              }}
             />
           </div>
 
           {/* Right Column: Newsfeed/Timeline (Span 7) */}
           <div className="col-span-1 md:col-span-12 lg:col-span-7 flex flex-col animate-[fadeIn_0.5s_ease-out]">
             
-            {/* Sticky Timeline Header at top of Right Column - Pinned Sticky aligned with Left Column */}
-            <div className="sticky top-[56px] md:top-[72px] z-30 bg-[#f0f2f5] py-2.5 mb-4 border-b border-gray-200/80 flex items-center justify-between">
-              <span className="text-gray-600 font-bold font-sans text-sm">Portfolio Timeline</span>
-              <span className="text-xs font-semibold text-gray-405 uppercase tracking-wider">Chronological</span>
-            </div>
+
 
             {/* Conditional Composer / Create Post Card: Authorized Melmar Mode only */}
             {isOwnerMode && (

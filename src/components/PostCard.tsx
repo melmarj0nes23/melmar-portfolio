@@ -623,7 +623,7 @@ export default function PostCard({
           >
             <ThumbsUp className={`w-5 h-5 ${hasLiked ? 'fill-[#1877f2]' : ''}`} />
           </motion.div>
-          <span>React / Like</span>
+          <span>Like</span>
         </button>
 
         {/* Comment button */}

@@ -9,9 +9,10 @@ interface IntroSidebarProps {
   profile: UserProfile;
   posts: Post[];
   onPhotoClick?: (index: number, photos: string[]) => void;
+  onSkillClick?: (skill: string) => void;
 }
 
-export default function IntroSidebar({ profile, posts, onPhotoClick }: IntroSidebarProps) {
+export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClick }: IntroSidebarProps) {
   // Extract all unique project images dynamically from standard posts/projects
   const projectPhotos = useMemo(() => {
     const images: string[] = [];
@@ -103,7 +104,11 @@ export default function IntroSidebar({ profile, posts, onPhotoClick }: IntroSide
           <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Core Tech Stack</h4>
           <div className="flex flex-wrap gap-1.5">
             {profile.skills.map((skill, index) => (
-              <span key={index} className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium px-2.5 py-1 rounded transition-colors cursor-pointer">
+              <span 
+                key={index} 
+                onClick={() => onSkillClick?.(skill)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium px-2.5 py-1 rounded transition-colors cursor-pointer"
+              >
                 {skill}
               </span>
             ))}
