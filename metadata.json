@@ -1,0 +1,8 @@
+{
+  "name": "Developer Facebook Profile Portfolio",
+  "description": "A full-stack, classic Facebook Profile desktop-styled developer portfolio featuring real-time Firestore synchronization for project posts, active reactions, and customizable comments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

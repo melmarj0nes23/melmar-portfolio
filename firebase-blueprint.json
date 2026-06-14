@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Post": {
+      "title": "Portfolio Post",
+      "description": "A portfolio project display post, mimicking a Facebook post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the project" },
+        "description": { "type": "string", "description": "Text description of the project" },
+        "imageUrl": { "type": "string", "description": "Image URL or background styled visual representing the project" },
+        "tags": { "type": "array", "description": "Tech stack tags" },
+        "likesCount": { "type": "integer", "description": "Number of reactions/likes" },
+        "likedBy": { "type": "array", "description": "Array of visitor IDs who have liked this post" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of creation" }
+      },
+      "required": ["title", "description", "tags", "likesCount", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A comment on a project post",
+      "type": "object",
+      "properties": {
+        "author": { "type": "string", "description": "DisplayName or name of the commenter" },
+        "text": { "type": "string", "description": "Content of the comment" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of comment" }
+      },
+      "required": ["author", "text", "createdAt"]
+    },
+    "Visitor": {
+      "title": "Visitor",
+      "description": "A logging record of a custom visitor profile on the portfolio",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Greeting or nickname of visitor" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of logging" }
+      },
+      "required": ["name", "createdAt"]
+    }
+  },
+  "firestore": {
+    "posts": {
+      "schema": "Post",
+      "description": "Chronological portfolio project posts"
+    },
+    "posts/{postId}/comments": {
+      "schema": "Comment",
+      "description": "Comments left by visitors on a specific post"
+    },
+    "visitors": {
+      "schema": "Visitor",
+      "description": "Logged visitor profiles with chronological order"
+    }
+  }
+}

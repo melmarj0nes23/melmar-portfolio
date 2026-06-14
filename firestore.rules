@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Post
+    function isValidPost(data) {
+      return (!data.keys().hasAll(['title']) || (data.title is string && data.title.size() <= 150))
+        && (!data.keys().hasAll(['description']) || (data.description is string && data.description.size() <= 5000))
+        && (!data.keys().hasAll(['tags']) || (data.tags is list && data.tags.size() <= 20))
+        && (!data.keys().hasAll(['likesCount']) || (data.likesCount is int && data.likesCount >= 0))
+        && (!data.keys().hasAll(['likedBy']) || (data.likedBy is list && data.likedBy.size() <= 2000))
+        && (!data.keys().hasAll(['imageUrl']) || data.imageUrl == null || (data.imageUrl is string && data.imageUrl.size() <= 2000))
+        && (!data.keys().hasAll(['imageUrls']) || (data.imageUrls is list && data.imageUrls.size() <= 20 && (data.imageUrls.size() == 0 || data.imageUrls[0] is string)));
+    }
+
+    // Validation for Comment
+    function isValidComment(data) {
+      return (!data.keys().hasAll(['author']) || (data.author is string && data.author.size() <= 100))
+        && (!data.keys().hasAll(['text']) || (data.text is string && data.text.size() <= 2000));
+    }
+
+    // Validation for Visitor
+    function isValidVisitor(data) {
+      return (!data.keys().hasAll(['name']) || (data.name is string && data.name.size() <= 100))
+        && (!data.keys().hasAll(['createdAt']) || data.createdAt != null);
+    }
+
+    // Match rules for Posts collection
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isValidId(postId) && isValidPost(incoming())
+        && incoming().keys().hasAll(['title', 'description', 'tags', 'likesCount', 'likedBy', 'createdAt'])
+        && incoming().keys().size() >= 6 && incoming().keys().size() <= 8;
+      allow update: if isValidId(postId) && isValidPost(incoming());
+      allow delete: if true;
+    }
+
+    // Match rules for Comments subcollection
+    match /posts/{postId}/comments/{commentId} {
+      allow read: if true;
+      allow create: if isValidId(postId) && isValidId(commentId) && isValidComment(incoming());
+      allow update, delete: if true;
+    }
+
+    // Match rules for Visitors collection
+    match /visitors/{visitorId} {
+      allow read, list: if true;
+      allow create, update: if isValidId(visitorId) && isValidVisitor(incoming());
+      allow delete: if false;
+    }
+  }
+}
