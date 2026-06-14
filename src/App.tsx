@@ -98,6 +98,39 @@ export default function App() {
   const [visitorOrdinal, setVisitorOrdinal] = useState<number>(1);
   const [activeLightbox, setActiveLightbox] = useState<{ urls: string[]; index: number } | null>(null);
 
+  // Swipe states for mobile activeLightbox modal
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (urlsLength: number) => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      // Swiped Left -> next image
+      setActiveLightbox(prev => prev ? {
+        ...prev,
+        index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
+      } : null);
+    } else if (distance < -minSwipeDistance) {
+      // Swiped Right -> previous image
+      setActiveLightbox(prev => prev ? {
+        ...prev,
+        index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
+      } : null);
+    }
+  };
+
   // Database cleanup to remove previously seeded/fake data
   useEffect(() => {
     const runCleanup = async () => {
@@ -517,7 +550,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="pt-4 px-2 sm:px-4 max-w-5xl mx-auto flex flex-col gap-4 font-sans">
+      <main className="pt-4 px-2 sm:px-4 max-w-6xl mx-auto flex flex-col gap-4 font-sans">
         
         {/* Profile Head */}
         <ProfileHeader
@@ -531,7 +564,7 @@ export default function App() {
 
         {/* Owner Verification Console - Hidden by default, toggled via Node.js badge or shown active */}
         {(isOwnerMode || showPasscodeForm) && (
-          <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-5xl mx-auto w-full shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-sm">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-6xl mx-auto w-full shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-sm">
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${isOwnerMode ? 'bg-[#1877f2] animate-pulse' : 'bg-gray-400'}`}></span>
               <span className="text-gray-700 text-xs font-semibold uppercase tracking-wider">
@@ -632,10 +665,10 @@ export default function App() {
         )}
 
         {/* Two-Column Workspace Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-5xl w-full mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-6xl w-full mx-auto">
           
-          {/* Left Column: Intro Sidebar (Span 5) - Pinned Sticky on desktop only */}
-          <div className="col-span-1 md:col-span-12 lg:col-span-5 lg:sticky lg:top-[72px] h-fit flex flex-col gap-4">
+          {/* Left Column: Intro Sidebar (Span 4) - Pinned Sticky on desktop only */}
+          <div className="col-span-1 md:col-span-12 lg:col-span-4 lg:sticky lg:top-[72px] h-fit flex flex-col gap-4">
             <IntroSidebar 
               profile={profile} 
               posts={posts} 
@@ -648,8 +681,8 @@ export default function App() {
             />
           </div>
 
-          {/* Right Column: Newsfeed/Timeline (Span 7) */}
-          <div className="col-span-1 md:col-span-12 lg:col-span-7 flex flex-col animate-[fadeIn_0.5s_ease-out]">
+          {/* Right Column: Newsfeed/Timeline (Span 8) */}
+          <div className="col-span-1 md:col-span-12 lg:col-span-8 flex flex-col animate-[fadeIn_0.5s_ease-out]">
             
 
 
@@ -708,7 +741,13 @@ export default function App() {
             className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center select-none"
             onClick={() => setActiveLightbox(null)}
           >
-            <div className="relative w-full h-full max-w-4xl max-h-[85vh] flex items-center justify-center px-4" onClick={e => e.stopPropagation()}>
+            <div 
+              className="relative w-full h-full max-w-4xl max-h-[85vh] flex items-center justify-center px-4 touch-pan-y" 
+              onClick={e => e.stopPropagation()}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={() => handleTouchEnd(activeLightbox.urls.length)}
+            >
               <img 
                 src={activeLightbox.urls[activeLightbox.index]} 
                 alt={`Screenshot projection ${activeLightbox.index + 1}`}

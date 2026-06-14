@@ -75,9 +75,9 @@ export default function ProfileHeader({
   };
 
   return (
-    <div className="bg-white shadow border border-gray-200 rounded-b-lg overflow-hidden max-w-5xl mx-auto mt-14" id="fb-profile-header">
+    <div className="bg-white shadow border border-gray-200 rounded-lg max-w-6xl mx-auto mt-14 relative" id="fb-profile-header">
       {/* Cover Photo */}
-      <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200">
+      <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200 rounded-t-lg overflow-hidden">
         <img
           src={profile.coverPhoto}
           alt="Cover Backplate"
@@ -341,7 +341,7 @@ export default function ProfileHeader({
       </div>
 
       {/* Bio / Short Intro Section underneath */}
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex-grow max-w-3xl w-full text-center md:text-left">
           <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-center md:text-left">Intro Bio</h2>
           {isEditingBio ? (
