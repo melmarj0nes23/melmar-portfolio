@@ -4,6 +4,31 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Post, Comment } from '../types';
 import CommentSection from './CommentSection';
 
+const renderDescriptionWithLinks = (text: string) => {
+  if (!text) return null;
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      const url = part.toLowerCase().startsWith('http') ? part : `https://${part}`;
+      return (
+        <a
+          key={index}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#1877f2] hover:underline break-all font-medium"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 interface PostCardProps {
   key?: string;
   post: Post;
@@ -317,7 +342,7 @@ export default function PostCard({
               {post.title}
             </h3>
             <p className="text-[14px] leading-relaxed text-gray-800 whitespace-pre-wrap">
-              {post.description}
+              {renderDescriptionWithLinks(post.description)}
             </p>
 
             {/* Tech Stack HashTags / Badges */}
