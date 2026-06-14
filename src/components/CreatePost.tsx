@@ -228,7 +228,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
         <div className="flex items-center justify-between border-t border-gray-200 mt-3 pt-3 text-xs sm:text-sm text-gray-500 font-semibold font-sans">
           <button onClick={() => setIsExpanded(true)} className="flex items-center justify-center gap-2 h-10 hover:bg-gray-50 rounded-lg flex-1 transition-colors text-red-500">
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></span>
-            <span>Live Portfolio Item</span>
+            <span>Live Portfolio</span>
           </button>
           <button onClick={() => setIsExpanded(true)} className="flex items-center justify-center gap-2 h-10 hover:bg-gray-50 rounded-lg flex-1 transition-colors text-green-500">
             <Image className="w-5 h-5" />

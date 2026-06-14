@@ -35,6 +35,26 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of logging" }
       },
       "required": ["name", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Developer profile setting including stats and social links",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the developer" },
+        "role": { "type": "string", "description": "Current title or role" },
+        "company": { "type": "string", "description": "Company or current association" },
+        "location": { "type": "string", "description": "Geographic location" },
+        "bio": { "type": "string", "description": "Short description header" },
+        "avatar": { "type": "string", "description": "Profile picture URL" },
+        "coverPhoto": { "type": "string", "description": "Cover banner image URL" },
+        "github": { "type": "string", "description": "Github profile URL Link" },
+        "linkedin": { "type": "string", "description": "Linkedin profile URL Link" },
+        "facebook": { "type": "string", "description": "Facebook profile URL Link" },
+        "email": { "type": "string", "description": "Email mailto link" },
+        "skills": { "type": "array", "description": "Core tech-stack skills list" }
+      },
+      "required": ["name", "skills"]
     }
   },
   "firestore": {
@@ -49,6 +69,10 @@
     "visitors": {
       "schema": "Visitor",
       "description": "Logged visitor profiles with chronological order"
+    },
+    "profiles": {
+      "schema": "UserProfile",
+      "description": "Customizable developer profile settings synced across devices"
     }
   }
 }

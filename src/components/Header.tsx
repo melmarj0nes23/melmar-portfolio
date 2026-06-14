@@ -94,7 +94,7 @@ export default function Header({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Search Developer Portfolio..."
+            placeholder="Search Projects"
             className="w-full h-9 pl-9 pr-4 bg-white/10 text-white placeholder-white/70 rounded-full focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 text-sm transition-all border border-transparent focus:border-blue-300"
             disabled
           />
@@ -240,8 +240,7 @@ export default function Header({
 
                   <div className="bg-blue-50/50 rounded-xl p-3 border border-blue-100/30 flex items-center justify-between">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-slate-500">Live Traffic Counter</span>
-                      <span className="text-xs text-gray-400 font-medium">Unique developers clocked</span>
+                      <span className="text-xs font-bold text-slate-600">Live Visitor Counter</span>
                     </div>
                     <span className="text-lg font-black text-[#1877f2] bg-white px-3 py-1 rounded-lg shadow-sm border border-blue-100">
                       #{visitorCount}

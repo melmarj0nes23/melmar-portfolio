@@ -342,14 +342,14 @@ export default function ProfileHeader({
 
       {/* Bio / Short Intro Section underneath */}
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex-grow max-w-3xl">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Intro Bio</h2>
+        <div className="flex-grow max-w-3xl w-full text-center md:text-left">
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 text-center md:text-left">Intro Bio</h2>
           {isEditingBio ? (
             <div className="flex flex-col gap-2">
               <textarea
                 value={editedBio}
                 onChange={(e) => setEditedBio(e.target.value)}
-                className="w-full text-sm text-gray-700 border border-gray-300 rounded p-2 focus:ring-1 focus:ring-[#1877f2] focus:outline-none bg-white font-sans"
+                className="w-full text-sm text-gray-700 border border-gray-300 rounded p-2 focus:ring-1 focus:ring-[#1877f2] focus:outline-none bg-white font-sans text-center md:text-left"
                 rows={2}
                 maxLength={200}
               />
@@ -369,8 +369,8 @@ export default function ProfileHeader({
               </div>
             </div>
           ) : (
-            <div className="flex items-start gap-1">
-              <p className="text-sm text-gray-700 italic font-sans leading-relaxed">
+            <div className="flex items-center justify-center md:items-start md:justify-start gap-1 w-full">
+              <p className="text-sm text-gray-700 italic font-sans leading-relaxed text-center md:text-left flex-grow">
                 "{profile.bio}"
               </p>
               {isOwner && (
@@ -381,7 +381,7 @@ export default function ProfileHeader({
             </div>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5 md:justify-end items-center max-w-sm">
+        <div className="flex flex-wrap gap-1.5 justify-center md:justify-end items-center max-w-sm w-full md:w-auto">
           {profile.skills.slice(0, 5).map((skill, idx) => (
             <span key={idx} className="bg-blue-50 text-[#1877f2] border border-blue-100 text-xs font-semibold px-2 py-0.5 rounded-full">
               {skill}

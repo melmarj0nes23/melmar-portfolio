@@ -40,6 +40,33 @@ export default function PostCard({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Swipe states for mobile lightbox
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (imagesLength: number) => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      // Swiped Left -> next image
+      setLightboxIndex((prev) => (prev === imagesLength - 1 ? 0 : prev + 1));
+    } else if (distance < -minSwipeDistance) {
+      // Swiped Right -> previous image
+      setLightboxIndex((prev) => (prev === 0 ? imagesLength - 1 : prev - 1));
+    }
+  };
+
   // Edit Mode states
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(post.title);
@@ -322,13 +349,13 @@ export default function PostCard({
             if (images.length === 1) {
               return (
                 <div 
-                  className="my-2 border-y border-gray-100 bg-gray-50 flex items-center justify-center max-h-[460px] overflow-hidden select-none cursor-pointer"
+                  className="my-2 border-y border-gray-100 bg-gray-50 flex items-center justify-center max-h-[460px] w-full overflow-hidden select-none cursor-pointer"
                   onClick={() => handleImageClick(0)}
                 >
                   <img
                     src={images[0]}
                     alt={post.title}
-                    className="w-full h-full object-contain max-h-[460px] hover:scale-[1.01] transition-transform duration-300"
+                    className="w-full max-h-[460px] object-contain hover:scale-[1.01] transition-transform duration-300 block"
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -347,7 +374,7 @@ export default function PostCard({
                       <img
                         src={img}
                         alt={`${post.title} showcase ${idx + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                         referrerPolicy="no-referrer"
                       />
                     </div>
@@ -367,11 +394,11 @@ export default function PostCard({
                     <img
                       src={images[0]}
                       alt={`${post.title} showcase 1`}
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
                   </div>
-                  <div className="col-span-4 grid grid-rows-2 gap-1 h-full">
+                  <div className="col-span-4 grid grid-rows-2 gap-1 h-full relative">
                     {images.slice(1, 3).map((img, idx) => (
                       <div 
                         key={idx} 
@@ -381,7 +408,7 @@ export default function PostCard({
                         <img
                           src={img}
                           alt={`${post.title} showcase ${idx + 2}`}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                           referrerPolicy="no-referrer"
                         />
                       </div>
@@ -402,11 +429,11 @@ export default function PostCard({
                     <img
                       src={images[0]}
                       alt={`${post.title} showcase 1`}
-                      className="w-full h-full object-cover group-hover:scale-101 transition-transform duration-300 pointer-events-none"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-101 transition-transform duration-300 pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
                   </div>
-                  <div className="grid grid-cols-3 gap-1 h-[90px] sm:h-[120px]">
+                  <div className="grid grid-cols-3 gap-1 h-[90px] sm:h-[120px] relative">
                     {images.slice(1, 4).map((img, idx) => (
                       <div 
                         key={idx} 
@@ -416,7 +443,7 @@ export default function PostCard({
                         <img
                           src={img}
                           alt={`${post.title} showcase ${idx + 2}`}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                           referrerPolicy="no-referrer"
                         />
                       </div>
@@ -431,7 +458,7 @@ export default function PostCard({
             return (
               <div className="my-2 border-y border-gray-100 bg-gray-100 flex flex-col gap-1 select-none h-[320px] sm:h-[400px]">
                 {/* Top: 2 equal-width images */}
-                <div className="grid grid-cols-2 gap-1 flex-grow">
+                <div className="grid grid-cols-2 gap-1 flex-grow relative">
                   {images.slice(0, 2).map((img, idx) => (
                     <div 
                       key={idx} 
@@ -441,14 +468,14 @@ export default function PostCard({
                       <img
                         src={img}
                         alt={`${post.title} showcase ${idx + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                         referrerPolicy="no-referrer"
                       />
                     </div>
                   ))}
                 </div>
                 {/* Bottom: 3 equal-width images (the 3rd image has dynamic overlay if count > 5) */}
-                <div className="grid grid-cols-3 gap-1 h-[90px] sm:h-[130px]">
+                <div className="grid grid-cols-3 gap-1 h-[90px] sm:h-[130px] relative">
                   {images.slice(2, 5).map((img, idx) => {
                     const actualIdx = idx + 2;
                     const isLastCell = idx === 2;
@@ -461,7 +488,7 @@ export default function PostCard({
                         <img
                           src={img}
                           alt={`${post.title} showcase ${actualIdx + 1}`}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 pointer-events-none"
                           referrerPolicy="no-referrer"
                         />
                         {isLastCell && remainingCount > 0 && (
@@ -498,7 +525,13 @@ export default function PostCard({
                   onClick={() => setIsLightboxOpen(false)}
                 >
                   {/* Main image viewer area */}
-                  <div className="flex-grow flex items-center justify-center relative p-4 h-[70vh] md:h-auto" onClick={(e) => e.stopPropagation()}>
+                  <div 
+                    className="flex-grow flex items-center justify-center relative p-4 h-[70vh] md:h-auto touch-pan-y" 
+                    onClick={(e) => e.stopPropagation()}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={() => handleTouchEnd(images.length)}
+                  >
                     <img
                       src={images[activeIndex]}
                       alt={`${post.title} full view ${activeIndex + 1}`}

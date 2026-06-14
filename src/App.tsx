@@ -197,29 +197,98 @@ export default function App() {
   const [passcodeError, setPasscodeError] = useState<string | null>(null);
   const [showPasscodeForm, setShowPasscodeForm] = useState<boolean>(false);
 
-  // Sync profile details cache
-  const handleUpdateBio = (newBio: string) => {
+  // Real-time synchronization of the developer's profile from Firestore
+  useEffect(() => {
+    const profileRef = doc(db, 'profiles', 'melmar');
+    const unsubscribe = onSnapshot(profileRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const updatedProfile: UserProfile = {
+          name: data.name || 'Melmar Jones Velasco',
+          role: data.role || 'Aspiring Full-Stack Developer',
+          company: data.company || 'Hands-On Learning & AI Innovation',
+          location: data.location || 'Alcala, Pangasinan, PH',
+          bio: data.bio || 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
+          avatar: data.avatar || '/profile/melmar.jpg',
+          coverPhoto: data.coverPhoto || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          github: data.github || 'https://github.com/melmarj0nes23',
+          linkedin: data.linkedin || 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
+          facebook: data.facebook || 'https://facebook.com/melmarj0nes23',
+          email: data.email || 'mailto:melmarjvelasco@gmail.com',
+          skills: data.skills || ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
+        };
+        setProfile(updatedProfile);
+        localStorage.setItem('fb_portfolio_profile', JSON.stringify(updatedProfile));
+      } else {
+        // Seed default profile to Firestore if not present yet
+        const defaultProfile = {
+          name: 'Melmar Jones Velasco',
+          role: 'Aspiring Full-Stack Developer',
+          company: 'Hands-On Learning & AI Innovation',
+          location: 'Alcala, Pangasinan, PH',
+          bio: 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
+          avatar: '/profile/melmar.jpg',
+          coverPhoto: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          github: 'https://github.com/melmarj0nes23',
+          linkedin: 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
+          facebook: 'https://facebook.com/melmarj0nes23',
+          email: 'mailto:melmarjvelasco@gmail.com',
+          skills: ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
+        };
+        setDoc(profileRef, defaultProfile).catch((err) => {
+          console.warn("Could not seed default profile to Firestore:", err);
+        });
+      }
+    }, (error) => {
+      console.warn("Warning fetching profile snapshot from Firestore:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Sync profile details across all devices using Firestore
+  const handleUpdateBio = async (newBio: string) => {
     const updated = { ...profile, bio: newBio };
     setProfile(updated);
     localStorage.setItem('fb_portfolio_profile', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'profiles', 'melmar'), { bio: newBio }, { merge: true });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'profiles/melmar');
+    }
   };
 
-  const handleUpdateName = (newName: string) => {
+  const handleUpdateName = async (newName: string) => {
     const updated = { ...profile, name: newName };
     setProfile(updated);
     localStorage.setItem('fb_portfolio_profile', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'profiles', 'melmar'), { name: newName }, { merge: true });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'profiles/melmar');
+    }
   };
 
-  const handleUpdateAvatar = (newAvatar: string) => {
+  const handleUpdateAvatar = async (newAvatar: string) => {
     const updated = { ...profile, avatar: newAvatar };
     setProfile(updated);
     localStorage.setItem('fb_portfolio_profile', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'profiles', 'melmar'), { avatar: newAvatar }, { merge: true });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'profiles/melmar');
+    }
   };
 
-  const handleUpdateCoverPhoto = (newCover: string) => {
+  const handleUpdateCoverPhoto = async (newCover: string) => {
     const updated = { ...profile, coverPhoto: newCover };
     setProfile(updated);
     localStorage.setItem('fb_portfolio_profile', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'profiles', 'melmar'), { coverPhoto: newCover }, { merge: true });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, 'profiles/melmar');
+    }
   };
 
   // Main Posts Synchronization subscription

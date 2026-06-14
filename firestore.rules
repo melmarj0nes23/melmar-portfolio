@@ -43,6 +43,22 @@ service cloud.firestore {
         && (!data.keys().hasAll(['createdAt']) || data.createdAt != null);
     }
 
+    // Validation for UserProfile
+    function isValidProfile(data) {
+      return (!('name' in data) || (data.name is string && data.name.size() <= 150))
+        && (!('role' in data) || (data.role is string && data.role.size() <= 200))
+        && (!('company' in data) || (data.company is string && data.company.size() <= 250))
+        && (!('location' in data) || (data.location is string && data.location.size() <= 200))
+        && (!('bio' in data) || (data.bio is string && data.bio.size() <= 2000))
+        && (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 2500))
+        && (!('coverPhoto' in data) || (data.coverPhoto is string && data.coverPhoto.size() <= 2500))
+        && (!('github' in data) || (data.github is string && data.github.size() <= 1500))
+        && (!('linkedin' in data) || (data.linkedin is string && data.linkedin.size() <= 1500))
+        && (!('facebook' in data) || (data.facebook is string && data.facebook.size() <= 1500))
+        && (!('email' in data) || (data.email is string && data.email.size() <= 1500))
+        && (!('skills' in data) || (data.skills is list && data.skills.size() <= 50));
+    }
+
     // Match rules for Posts collection
     match /posts/{postId} {
       allow read: if true;
@@ -64,6 +80,13 @@ service cloud.firestore {
     match /visitors/{visitorId} {
       allow read, list: if true;
       allow create, update: if isValidId(visitorId) && isValidVisitor(incoming());
+      allow delete: if false;
+    }
+
+    // Match rules for Profile collection (shared/synced across devices)
+    match /profiles/{profileId} {
+      allow read, get: if true;
+      allow create, update: if isValidId(profileId) && isValidProfile(incoming());
       allow delete: if false;
     }
   }
