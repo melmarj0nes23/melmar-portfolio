@@ -125,8 +125,8 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                 placeholder="What is this project about? Write a classic timeline update detailing challenges, successes, and architecture..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full min-h-[90px] bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1877f2] focus:border-transparent text-sm font-sans text-gray-700 placeholder-gray-400 leading-relaxed resize-none"
-                maxLength={1000}
+                className="w-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1877f2] focus:border-transparent text-sm font-sans text-gray-700 placeholder-gray-400 leading-relaxed resize-none"
+                maxLength={20000}
                 required
               />
 
