@@ -331,6 +331,27 @@ export default function App() {
 
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       if (snapshot.empty) {
+        // Check if we have already seeded or if user manually cleared posts
+        if (localStorage.getItem('fb_portfolio_seeded') === 'true') {
+          setPosts([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Deep cross-device verification to check if seeded is recorded in profile
+        try {
+          const { getDoc } = await import('firebase/firestore');
+          const pDoc = await getDoc(doc(db, 'profiles', 'melmar'));
+          if (pDoc.exists() && pDoc.data()?.seeded === true) {
+            localStorage.setItem('fb_portfolio_seeded', 'true');
+            setPosts([]);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.warn("Cross-device seeding guard fetch warning:", e);
+        }
+
         // Seed initial 3 mock posts dynamically to satisfy target specs
         setIsLoading(true);
         try {
@@ -340,6 +361,9 @@ export default function App() {
         }
         setIsLoading(false);
         return;
+      } else {
+        // Since we have active posts, store that we are seeded so we don't re-seed on deletions
+        localStorage.setItem('fb_portfolio_seeded', 'true');
       }
 
       const loadedPosts: Post[] = snapshot.docs.map(doc => ({
@@ -425,6 +449,10 @@ export default function App() {
       const docRef = doc(db, 'posts', id);
       await setDoc(docRef, postData);
     }
+
+    // Set seeded flag so we never auto-seed again
+    localStorage.setItem('fb_portfolio_seeded', 'true');
+    await setDoc(doc(db, 'profiles', 'melmar'), { seeded: true }, { merge: true }).catch(() => {});
   };
 
   // Add a new project post
@@ -501,6 +529,10 @@ export default function App() {
   // Delete a post
   const handleDeletePost = async (postId: string) => {
     try {
+      // Prioritize preventing re-seed before delete starts so the snapshot action is blocked from re-seeding
+      localStorage.setItem('fb_portfolio_seeded', 'true');
+      await setDoc(doc(db, 'profiles', 'melmar'), { seeded: true }, { merge: true }).catch(() => {});
+      
       await deleteDoc(doc(db, 'posts', postId));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `posts/${postId}`);
