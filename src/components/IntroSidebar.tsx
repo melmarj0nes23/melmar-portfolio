@@ -13,6 +13,8 @@ interface IntroSidebarProps {
 }
 
 export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClick }: IntroSidebarProps) {
+  const [showAllPhotos, setShowAllPhotos] = React.useState(false);
+
   // Extract all unique project images dynamically from standard posts/projects
   const projectPhotos = useMemo(() => {
     const images: string[] = [];
@@ -170,24 +172,36 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
           </span>
         </div>
         <div className="grid grid-cols-3 gap-1 rounded overflow-hidden">
-          {projectPhotos.map((url, index) => (
-            <div 
-              key={index} 
-              className="aspect-square bg-gray-150 hover:brightness-95 overflow-hidden cursor-pointer relative group"
-              onClick={() => onPhotoClick?.(index, projectPhotos)}
-            >
-              <img 
-                src={url} 
-                alt={`Portfolio screenshot ${index + 1}`} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                referrerPolicy="no-referrer" 
-              />
-              <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                <Maximize2 className="w-4 h-4 text-white" />
+          {projectPhotos.map((url, index) => {
+            const isHiddenOnMobile = !showAllPhotos && index >= 6;
+            return (
+              <div 
+                key={index} 
+                className={`aspect-square bg-gray-150 hover:brightness-95 overflow-hidden cursor-pointer relative group ${isHiddenOnMobile ? 'hidden lg:block' : ''}`}
+                onClick={() => onPhotoClick?.(index, projectPhotos)}
+              >
+                <img 
+                  src={url} 
+                  alt={`Portfolio screenshot ${index + 1}`} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  referrerPolicy="no-referrer" 
+                />
+                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                  <Maximize2 className="w-4 h-4 text-white" />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        {projectPhotos.length > 6 && (
+          <button 
+            type="button" 
+            onClick={() => setShowAllPhotos(!showAllPhotos)}
+            className="w-full mt-2 py-1.5 text-xs text-blue-600 font-semibold hover:bg-blue-50 bg-gray-50 border border-blue-100 rounded transition-colors lg:hidden flex items-center justify-center gap-1 cursor-pointer"
+          >
+            {showAllPhotos ? 'Show Less' : `View All Photos (${projectPhotos.length})`}
+          </button>
+        )}
       </div>
     </div>
   );
