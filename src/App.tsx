@@ -18,7 +18,7 @@ import ProfileHeader from './components/ProfileHeader';
 import IntroSidebar from './components/IntroSidebar';
 import CreatePost from './components/CreatePost';
 import PostCard from './components/PostCard';
-import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Enums and Interfaces required by Firebase Integration Skill for Error Diagnostics
@@ -97,6 +97,25 @@ export default function App() {
   const [visitorCount, setVisitorCount] = useState<number>(1);
   const [visitorOrdinal, setVisitorOrdinal] = useState<number>(1);
   const [activeLightbox, setActiveLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+
+  // Mobile Floating Scroll to Top State & Effect
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Swipe states for mobile activeLightbox modal
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -579,6 +598,7 @@ export default function App() {
         userEmail={profile.email}
         visitorCount={visitorCount}
         visitorOrdinal={visitorOrdinal}
+        posts={posts}
       />
 
       {/* Main Container */}
@@ -830,6 +850,23 @@ export default function App() {
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Scroll to Top Icon for Mobile Screens */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.8 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 lg:hidden z-[999] p-3.5 bg-[#1877f2] hover:bg-[#166fe5] active:bg-[#1565c0] text-white rounded-full shadow-[0_4px_14px_rgba(24,119,242,0.4)] transition-all flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 border border-white/10"
+            title="Scroll back to top"
+            aria-label="Scroll back to top"
+          >
+            <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+          </motion.button>
         )}
       </AnimatePresence>
     </div>
