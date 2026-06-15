@@ -117,36 +117,94 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Swipe states for mobile activeLightbox modal
+  // Swipe and zoom states for mobile activeLightbox modal
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomOffset, setZoomOffset] = useState({ x: 0, y: 0 });
+  const [pinchStartDist, setPinchStartDist] = useState<number | null>(null);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setTouchEnd(null);
+    if (e.targetTouches.length === 2) {
+      // Pinch gesture
+      const dist = Math.hypot(
+        e.targetTouches[0].clientX - e.targetTouches[1].clientX,
+        e.targetTouches[0].clientY - e.targetTouches[1].clientY
+      );
+      setPinchStartDist(dist);
+      setTouchStart(null);
+    } else if (e.targetTouches.length === 1) {
+      if (zoomScale > 1) {
+        setDragStart({
+          x: e.targetTouches[0].clientX - zoomOffset.x,
+          y: e.targetTouches[0].clientY - zoomOffset.y
+        });
+      } else {
+        setTouchStart(e.targetTouches[0].clientX);
+        setTouchEnd(null);
+      }
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (e.targetTouches.length === 2 && pinchStartDist !== null) {
+      const dist = Math.hypot(
+        e.targetTouches[0].clientX - e.targetTouches[1].clientX,
+        e.targetTouches[0].clientY - e.targetTouches[1].clientY
+      );
+      const ratio = dist / pinchStartDist;
+      const nextScale = Math.min(Math.max(1, zoomScale * ratio), 4);
+      setZoomScale(nextScale);
+      setPinchStartDist(dist);
+    } else if (e.targetTouches.length === 1) {
+      if (zoomScale > 1 && dragStart !== null) {
+        const dx = e.targetTouches[0].clientX - dragStart.x;
+        const dy = e.targetTouches[0].clientY - dragStart.y;
+        
+        // constrain dragging margin bounds based on scale
+        const maxOffset = (zoomScale - 1) * 200;
+        const boundedX = Math.min(Math.max(-maxOffset, dx), maxOffset);
+        const boundedY = Math.min(Math.max(-maxOffset * 1.5, dy), maxOffset * 1.5);
+        setZoomOffset({ x: boundedX, y: boundedY });
+      } else if (zoomScale === 1) {
+        setTouchEnd(e.targetTouches[0].clientX);
+      }
+    }
   };
 
   const handleTouchEnd = (urlsLength: number) => {
+    setPinchStartDist(null);
+    setDragStart(null);
+
+    if (zoomScale > 1) return;
+
     if (touchStart === null || touchEnd === null) return;
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 50;
 
     if (distance > minSwipeDistance) {
       // Swiped Left -> next image
-      setActiveLightbox(prev => prev ? {
-        ...prev,
-        index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
-      } : null);
+      setActiveLightbox(prev => {
+        if (!prev) return null;
+        setZoomScale(1);
+        setZoomOffset({ x: 0, y: 0 });
+        return {
+          ...prev,
+          index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
+        };
+      });
     } else if (distance < -minSwipeDistance) {
       // Swiped Right -> previous image
-      setActiveLightbox(prev => prev ? {
-        ...prev,
-        index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
-      } : null);
+      setActiveLightbox(prev => {
+        if (!prev) return null;
+        setZoomScale(1);
+        setZoomOffset({ x: 0, y: 0 });
+        return {
+          ...prev,
+          index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
+        };
+      });
     }
   };
 
@@ -584,7 +642,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] pb-10 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-[#f4f6fa] pb-10 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Header bar */}
       <Header 
         userName={profile.name} 
@@ -618,14 +676,14 @@ export default function App() {
         {(isOwnerMode || showPasscodeForm) && (
           <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-6xl mx-auto w-full shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 font-sans text-sm">
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${isOwnerMode ? 'bg-[#1877f2] animate-pulse' : 'bg-gray-400'}`}></span>
+              <span className={`w-2 h-2 rounded-full ${isOwnerMode ? 'bg-[#4f46e5] animate-pulse' : 'bg-gray-400'}`}></span>
               <span className="text-gray-700 text-xs font-semibold uppercase tracking-wider">
                 {isOwnerMode ? (
-                  <span className="flex items-center gap-1.5 text-blue-700 font-bold font-sans">
-                    <ShieldCheck className="w-4 h-4 text-[#1877f2]" /> Melmar Mode Active (Owner Account)
+                  <span className="flex items-center gap-1.5 text-indigo-700 font-bold font-sans">
+                    <ShieldCheck className="w-4 h-4 text-[#4f46e5]" /> Melmar Mode Active (Owner Account)
                   </span>
                 ) : (
-                  <span className="text-[12px] font-sans font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/60 inline-flex items-center gap-1">
+                  <span className="text-[12px] font-sans font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200/60 inline-flex items-center gap-1">
                     Passcode Verification Required
                   </span>
                 )}
@@ -701,11 +759,11 @@ export default function App() {
                       id="passcode-input"
                       placeholder="Owner's passcode"
                       onChange={() => setPasscodeError(null)}
-                      className="bg-gray-50 border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-700 focus:outline-[#1877f2] flex-grow sm:w-44"
+                      className="bg-gray-50 border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-700 focus:outline-[#4f46e5] flex-grow sm:w-44"
                     />
                     <button
                       type="submit"
-                      className="px-3 py-1 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded text-xs font-semibold shadow transition-colors whitespace-nowrap cursor-pointer"
+                      className="px-3 py-1 bg-[#4f46e5] hover:bg-indigo-700 text-white rounded text-xs font-semibold shadow transition-colors whitespace-nowrap cursor-pointer"
                     >
                       Verify Owner
                     </button>
@@ -719,8 +777,8 @@ export default function App() {
         {/* Two-Column Workspace Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-6xl w-full mx-auto">
           
-          {/* Left Column: Intro Sidebar (Span 4) - Pinned Sticky on desktop only */}
-          <div className="col-span-1 md:col-span-12 lg:col-span-4 lg:sticky lg:top-[72px] h-fit flex flex-col gap-4">
+          {/* Left Column: Intro Sidebar (Span 4) */}
+          <div className="col-span-1 md:col-span-12 lg:col-span-4 flex flex-col gap-4 lg:min-h-full">
             <IntroSidebar 
               profile={profile} 
               posts={posts} 
@@ -752,7 +810,7 @@ export default function App() {
 
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <div className="w-10 h-10 border-4 border-gray-200 border-t-[#1877f2] rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-gray-200 border-t-[#4f46e5] rounded-full animate-spin"></div>
                   <span className="text-gray-500 text-sm font-semibold">Synchronizing profile timeline...</span>
                 </div>
               ) : posts.length === 0 ? (
@@ -791,10 +849,14 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center select-none"
-            onClick={() => setActiveLightbox(null)}
+            onClick={() => {
+              setActiveLightbox(null);
+              setZoomScale(1);
+              setZoomOffset({ x: 0, y: 0 });
+            }}
           >
             <div 
-              className="relative w-full h-full max-w-4xl max-h-[85vh] flex items-center justify-center px-4 touch-pan-y" 
+              className="relative w-full h-full max-w-4xl max-h-[85vh] flex items-center justify-center px-4 overflow-hidden" 
               onClick={e => e.stopPropagation()}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
@@ -803,13 +865,62 @@ export default function App() {
               <img 
                 src={activeLightbox.urls[activeLightbox.index]} 
                 alt={`Screenshot projection ${activeLightbox.index + 1}`}
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/5"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/5 transition-transform duration-100 ease-out select-none"
+                style={{
+                  transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
+                  touchAction: zoomScale > 1 ? 'none' : 'pan-y',
+                  cursor: zoomScale > 1 ? 'grab' : 'default'
+                }}
                 referrerPolicy="no-referrer"
               />
 
+              {/* Explicit Zoom Controller overlay */}
+              <div className="absolute top-4 left-4 flex gap-1.5 z-50">
+                <button
+                  type="button"
+                  onClick={() => setZoomScale(s => Math.min(s + 0.5, 4))}
+                  className="px-2.5 py-1.5 bg-black/60 hover:bg-indigo-600 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                  title="Zoom In"
+                >
+                  Zoom +
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoomScale(1);
+                    setZoomOffset({ x: 0, y: 0 });
+                  }}
+                  className="px-2.5 py-1.5 bg-black/60 hover:bg-slate-700 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                  title="Reset Zoom"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoomScale(s => {
+                      const next = s - 0.5;
+                      if (next <= 1) {
+                        setZoomOffset({ x: 0, y: 0 });
+                        return 1;
+                      }
+                      return next;
+                    });
+                  }}
+                  className="px-2.5 py-1.5 bg-black/60 hover:bg-indigo-600 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                  title="Zoom Out"
+                >
+                  Zoom -
+                </button>
+              </div>
+
               {/* Close Button */}
               <button
-                onClick={() => setActiveLightbox(null)}
+                onClick={() => {
+                  setActiveLightbox(null);
+                  setZoomScale(1);
+                  setZoomOffset({ x: 0, y: 0 });
+                }}
                 className="absolute top-4 right-4 p-2.5 bg-black/50 hover:bg-black/80 border border-white/10 text-white rounded-full transition-all cursor-pointer z-50 hover:scale-105 active:scale-95"
                 title="Close Lightbox"
               >
@@ -819,10 +930,14 @@ export default function App() {
               {/* Navigation Left */}
               {activeLightbox.urls.length > 1 && (
                 <button
-                  onClick={() => setActiveLightbox(prev => prev ? {
-                    ...prev,
-                    index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
-                  } : null)}
+                  onClick={() => {
+                    setZoomScale(1);
+                    setZoomOffset({ x: 0, y: 0 });
+                    setActiveLightbox(prev => prev ? {
+                      ...prev,
+                      index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
+                    } : null);
+                  }}
                   className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50"
                   title="Previous image"
                 >
@@ -833,10 +948,14 @@ export default function App() {
               {/* Navigation Right */}
               {activeLightbox.urls.length > 1 && (
                 <button
-                  onClick={() => setActiveLightbox(prev => prev ? {
-                    ...prev,
-                    index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
-                  } : null)}
+                  onClick={() => {
+                    setZoomScale(1);
+                    setZoomOffset({ x: 0, y: 0 });
+                    setActiveLightbox(prev => prev ? {
+                      ...prev,
+                      index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
+                    } : null);
+                  }}
                   className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50"
                   title="Next image"
                 >
@@ -861,7 +980,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 lg:hidden z-[999] p-3.5 bg-[#1877f2] hover:bg-[#166fe5] active:bg-[#1565c0] text-white rounded-full shadow-[0_4px_14px_rgba(24,119,242,0.4)] transition-all flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 border border-white/10"
+            className="fixed bottom-6 right-6 lg:hidden z-[999] p-3.5 bg-[#4f46e5] hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-full shadow-[0_4px_14px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 border border-white/10"
             title="Scroll back to top"
             aria-label="Scroll back to top"
           >

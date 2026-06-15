@@ -47,17 +47,17 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
   }, [posts]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:min-h-full lg:flex-1">
       {/* Box 1: Intro */}
       <div className="bg-white p-4 rounded-lg border border-gray-200 shadow" id="intro-card">
-        <h3 className="text-xl font-bold font-sans text-gray-900 mb-2">Intro</h3>
+        <h3 className="text-xl font-bold font-sans text-gray-900 mb-2">About Me</h3>
         
         {/* Developer Mission Statement / Philosophy */}
         <div className="mb-4 pb-3 border-b border-gray-100 text-[13px] text-gray-600 font-sans leading-relaxed flex flex-col gap-2">
           <p>
             I enjoy turning ideas into real projects using modern web technologies while continuously expanding my knowledge through hands-on learning.
           </p>
-          <div className="bg-blue-50/70 border border-blue-100 rounded p-2.5 text-xs text-blue-900 mt-1">
+          <div className="bg-indigo-50/70 border border-indigo-100 rounded p-2.5 text-xs text-indigo-900 mt-1">
             <span className="font-semibold block mb-0.5">🧠 AI-Assisted Development:</span>
             I leverage AI as a development partner to accelerate learning, brainstorm solutions, debug code, and improve productivity.
           </div>
@@ -82,7 +82,7 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
           <div className="flex items-center gap-3">
             <Globe className="w-5 h-5 text-gray-500 shrink-0" />
             <span>
-              Portfolio URL: <a href="https://melmar-portfolio.pages.dev/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">melmar-portfolio.pages.dev</a>
+              Portfolio URL: <a href="https://melmar-portfolio.pages.dev/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">melmar-portfolio.pages.dev</a>
             </span>
           </div>
 
@@ -144,7 +144,7 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
               rel="noopener noreferrer"
               className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs rounded flex items-center justify-center gap-1.5 transition-colors"
             >
-              <Facebook className="w-4 h-4 text-[#1877f2]" />
+              <Facebook className="w-4 h-4 text-[#4f46e5]" />
               Follow on Facebook
             </a>
           )}
@@ -161,13 +161,13 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
       </div>
 
       {/* Box 2: Photos Grid (Sourced dynamically from real project portfolios) */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow">
+      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow lg:sticky lg:top-[80px]">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="text-xl font-bold font-sans text-gray-900 leading-tight">Photos</h3>
             <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Project Screenshots</span>
           </div>
-          <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold">
+          <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold">
             {projectPhotos.length} Total
           </span>
         </div>
@@ -197,7 +197,7 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
           <button 
             type="button" 
             onClick={() => setShowAllPhotos(!showAllPhotos)}
-            className="w-full mt-2 py-1.5 text-xs text-blue-600 font-semibold hover:bg-blue-50 bg-gray-50 border border-blue-100 rounded transition-colors lg:hidden flex items-center justify-center gap-1 cursor-pointer"
+            className="w-full mt-2 py-1.5 text-xs text-indigo-600 font-semibold hover:bg-indigo-50 bg-gray-50 border border-indigo-100 rounded transition-colors lg:hidden flex items-center justify-center gap-1 cursor-pointer"
           >
             {showAllPhotos ? 'Show Less' : `View All Photos (${projectPhotos.length})`}
           </button>

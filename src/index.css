@@ -6,7 +6,7 @@
   --font-display: "Space Grotesk", sans-serif;
 }
 
-/* Custom Facebook utilities for retro scrollbars and borders */
+/* Custom scrollbar and layout utilities */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }

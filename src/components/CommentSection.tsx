@@ -53,7 +53,7 @@ export default function CommentSection({ comments, isSubmitting, onAddComment, o
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-2.5 items-start text-xs group" id={`comment-${comment.id}`}>
               {/* Commenter circular Avatar */}
-              <div className="w-8 h-8 rounded-full bg-[#1877f2] text-white font-bold flex items-center justify-center shrink-0 uppercase select-none text-[11px] shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-[#4f46e5] text-white font-bold flex items-center justify-center shrink-0 uppercase select-none text-[11px] shadow-sm">
                 {comment.author.charAt(0)}
               </div>
               
@@ -116,7 +116,7 @@ export default function CommentSection({ comments, isSubmitting, onAddComment, o
               localStorage.setItem('fb_portfolio_commenter_name', val);
             }}
             required
-            className="bg-white border border-gray-300 rounded-md py-1 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#1877f2] font-semibold text-gray-850 w-full sm:max-w-[180px]"
+            className="bg-white border border-gray-300 rounded-md py-1 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#4f46e5] font-semibold text-gray-850 w-full sm:max-w-[180px]"
             maxLength={25}
           />
         </div>
@@ -124,7 +124,7 @@ export default function CommentSection({ comments, isSubmitting, onAddComment, o
         {/* Comment Input bubble-row */}
         <div className="flex gap-2.5 items-center">
           {/* Visitor initial Avatar badge */}
-          <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0 text-xs select-none uppercase shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold flex items-center justify-center shrink-0 text-xs select-none uppercase shadow-sm">
             {visitorName.trim() ? visitorName.trim().charAt(0) : 'V'}
           </div>
           
@@ -136,14 +136,14 @@ export default function CommentSection({ comments, isSubmitting, onAddComment, o
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               disabled={isSubmitting || !visitorName.trim()}
-              className="w-full bg-gray-200 focus:bg-white text-[13px] text-gray-800 placeholder-gray-500 rounded-full py-2 pl-4 pr-10 focus:outline-none focus:ring-1 focus:ring-[#1877f2] border border-transparent focus:border-transparent transition-all"
+              className="w-full bg-gray-200 focus:bg-white text-[13px] text-gray-800 placeholder-gray-500 rounded-full py-2 pl-4 pr-10 focus:outline-none focus:ring-1 focus:ring-[#4f46e5] border border-transparent focus:border-transparent transition-all"
               maxLength={500}
             />
             <button
               type="submit"
               disabled={!inputText.trim() || !visitorName.trim() || isSubmitting}
-              className={`absolute right-2.5 p-1 rounded-full text-blue-500 transition-all ${
-                inputText.trim() && visitorName.trim() ? 'hover:bg-blue-50 scale-100 opacity-100' : 'scale-75 opacity-40 cursor-default'
+              className={`absolute right-2.5 p-1 rounded-full text-indigo-500 transition-all ${
+                inputText.trim() && visitorName.trim() ? 'hover:bg-indigo-50 scale-100 opacity-100' : 'scale-75 opacity-40 cursor-default'
               }`}
               title="Post Comment"
             >

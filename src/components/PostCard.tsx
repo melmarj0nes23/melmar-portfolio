@@ -18,7 +18,7 @@ const renderDescriptionWithLinks = (text: string) => {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#1877f2] hover:underline break-all font-medium"
+          className="text-[#4f46e5] hover:underline break-all font-medium"
           onClick={(e) => e.stopPropagation()}
         >
           {part}
@@ -65,30 +65,86 @@ export default function PostCard({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // Swipe states for mobile lightbox
+  // Swipe and zoom states for mobile lightbox
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomOffset, setZoomOffset] = useState({ x: 0, y: 0 });
+  const [pinchStartDist, setPinchStartDist] = useState<number | null>(null);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setTouchEnd(null);
+    if (e.targetTouches.length === 2) {
+      // Pinch gesture
+      const dist = Math.hypot(
+        e.targetTouches[0].clientX - e.targetTouches[1].clientX,
+        e.targetTouches[0].clientY - e.targetTouches[1].clientY
+      );
+      setPinchStartDist(dist);
+      setTouchStart(null);
+    } else if (e.targetTouches.length === 1) {
+      if (zoomScale > 1) {
+        setDragStart({
+          x: e.targetTouches[0].clientX - zoomOffset.x,
+          y: e.targetTouches[0].clientY - zoomOffset.y
+        });
+      } else {
+        setTouchStart(e.targetTouches[0].clientX);
+        setTouchEnd(null);
+      }
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (e.targetTouches.length === 2 && pinchStartDist !== null) {
+      const dist = Math.hypot(
+        e.targetTouches[0].clientX - e.targetTouches[1].clientX,
+        e.targetTouches[0].clientY - e.targetTouches[1].clientY
+      );
+      const ratio = dist / pinchStartDist;
+      const nextScale = Math.min(Math.max(1, zoomScale * ratio), 4);
+      setZoomScale(nextScale);
+      setPinchStartDist(dist);
+    } else if (e.targetTouches.length === 1) {
+      if (zoomScale > 1 && dragStart !== null) {
+        const dx = e.targetTouches[0].clientX - dragStart.x;
+        const dy = e.targetTouches[0].clientY - dragStart.y;
+        
+        // constrain dragging margin bounds based on scale
+        const maxOffset = (zoomScale - 1) * 200;
+        const boundedX = Math.min(Math.max(-maxOffset, dx), maxOffset);
+        const boundedY = Math.min(Math.max(-maxOffset * 1.5, dy), maxOffset * 1.5);
+        setZoomOffset({ x: boundedX, y: boundedY });
+      } else if (zoomScale === 1) {
+        setTouchEnd(e.targetTouches[0].clientX);
+      }
+    }
   };
 
   const handleTouchEnd = (imagesLength: number) => {
+    setPinchStartDist(null);
+    setDragStart(null);
+
+    if (zoomScale > 1) return;
+
     if (touchStart === null || touchEnd === null) return;
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 50;
 
     if (distance > minSwipeDistance) {
       // Swiped Left -> next image
-      setLightboxIndex((prev) => (prev === imagesLength - 1 ? 0 : prev + 1));
+      setLightboxIndex((prev) => {
+        setZoomScale(1);
+        setZoomOffset({ x: 0, y: 0 });
+        return prev === imagesLength - 1 ? 0 : prev + 1;
+      });
     } else if (distance < -minSwipeDistance) {
       // Swiped Right -> previous image
-      setLightboxIndex((prev) => (prev === 0 ? imagesLength - 1 : prev - 1));
+      setLightboxIndex((prev) => {
+        setZoomScale(1);
+        setZoomOffset({ x: 0, y: 0 });
+        return prev === 0 ? imagesLength - 1 : prev - 1;
+      });
     }
   };
 
@@ -235,7 +291,7 @@ export default function PostCard({
       {isEditing ? (
         <form onSubmit={handleSaveEdit} className="px-4 pb-4 flex flex-col gap-3 font-sans border-t border-gray-100 pt-3 bg-gray-50/50">
           <div className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1">
-            <Edit2 className="w-3 h-3 text-[#1877f2]" /> Editing Portfolio Post
+            <Edit2 className="w-3 h-3 text-[#4f46e5]" /> Editing Portfolio Post
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Project Title</label>
@@ -243,7 +299,7 @@ export default function PostCard({
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[#1877f2]"
+              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[#4f46e5]"
               required
             />
           </div>
@@ -252,7 +308,7 @@ export default function PostCard({
             <textarea
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#1877f2] min-h-[110px] resize-none leading-relaxed text-gray-700"
+              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#4f46e5] min-h-[110px] resize-none leading-relaxed text-gray-700"
               required
             />
           </div>
@@ -262,7 +318,7 @@ export default function PostCard({
               type="text"
               value={editTags}
               onChange={(e) => setEditTags(e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#1877f2]"
+              className="w-full bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#4f46e5]"
             />
           </div>
           <div>
@@ -279,7 +335,7 @@ export default function PostCard({
                     handleEditAddUrl();
                   }
                 }}
-                className="flex-grow bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#1877f2]"
+                className="flex-grow bg-white border border-gray-300 rounded-lg py-1.5 px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#4f46e5]"
               />
               <button
                 type="button"
@@ -327,7 +383,7 @@ export default function PostCard({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-1.5 bg-[#1877f2] hover:bg-[#166fe5] font-semibold text-white text-xs rounded-md shadow-sm transition-all flex items-center gap-1"
+              className="px-4 py-1.5 bg-[#4f46e5] hover:bg-indigo-700 font-semibold text-white text-xs rounded-md shadow-sm transition-all flex items-center gap-1"
             >
               <Save className="w-3.5 h-3.5" />
               {isSaving ? 'Saving...' : 'Save Changes'}
@@ -338,7 +394,7 @@ export default function PostCard({
         <>
           {/* Post Body text */}
           <div className="px-4 pb-2 font-sans">
-            <h3 className="text-lg font-bold text-gray-900 leading-snug mb-1.5 hover:text-[#1877f2] transition-colors cursor-pointer">
+            <h3 className="text-lg font-bold text-gray-900 leading-snug mb-1.5 hover:text-[#4f46e5] transition-colors cursor-pointer">
               {post.title}
             </h3>
             <p className="text-[14px] leading-relaxed text-gray-800 whitespace-pre-wrap">
@@ -350,7 +406,7 @@ export default function PostCard({
               {post.tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center text-xs font-semibold text-[#1877f2] hover:underline cursor-pointer bg-blue-50/50 px-2 py-0.5 rounded"
+                  className="inline-flex items-center text-xs font-semibold text-[#4f46e5] hover:underline cursor-pointer bg-indigo-50/50 px-2 py-0.5 rounded"
                 >
                   #{tag.toLowerCase().replace(/\s+/g, '')}
                 </span>
@@ -546,12 +602,16 @@ export default function PostCard({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/95 z-50 flex flex-col md:flex-row items-stretch select-none"
-                  onClick={() => setIsLightboxOpen(false)}
+                  className="fixed inset-0 bg-black/95 z-[9999] flex flex-col md:flex-row items-stretch select-none"
+                  onClick={() => {
+                    setIsLightboxOpen(false);
+                    setZoomScale(1);
+                    setZoomOffset({ x: 0, y: 0 });
+                  }}
                 >
                   {/* Main image viewer area */}
                   <div 
-                    className="flex-grow flex items-center justify-center relative p-4 h-[70vh] md:h-auto touch-pan-y" 
+                    className="flex-grow flex items-center justify-center relative p-4 h-[70vh] md:h-auto overflow-hidden animate-[fadeIn_0.2s_ease-out]" 
                     onClick={(e) => e.stopPropagation()}
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
@@ -560,13 +620,62 @@ export default function PostCard({
                     <img
                       src={images[activeIndex]}
                       alt={`${post.title} full view ${activeIndex + 1}`}
-                      className="max-w-full max-h-full object-contain rounded shadow-2xl transition-all duration-300"
+                      className="max-w-full max-h-full object-contain rounded shadow-2xl transition-transform duration-100 ease-out select-none"
+                      style={{
+                        transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
+                        touchAction: zoomScale > 1 ? 'none' : 'pan-y',
+                        cursor: zoomScale > 1 ? 'grab' : 'default'
+                      }}
                       referrerPolicy="no-referrer"
                     />
 
+                    {/* Explicit Zoom Controller overlay */}
+                    <div className="absolute top-4 left-4 flex gap-1.5 z-50">
+                      <button
+                        type="button"
+                        onClick={() => setZoomScale(s => Math.min(s + 0.5, 4))}
+                        className="px-2.5 py-1.5 bg-black/60 hover:bg-indigo-600 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                        title="Zoom In"
+                      >
+                        Zoom +
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setZoomScale(1);
+                          setZoomOffset({ x: 0, y: 0 });
+                        }}
+                        className="px-2.5 py-1.5 bg-black/60 hover:bg-slate-700 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                        title="Reset Zoom"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setZoomScale(s => {
+                            const next = s - 0.5;
+                            if (next <= 1) {
+                              setZoomOffset({ x: 0, y: 0 });
+                              return 1;
+                            }
+                            return next;
+                          });
+                        }}
+                        className="px-2.5 py-1.5 bg-black/60 hover:bg-indigo-600 active:scale-95 text-white rounded-lg transition-all border border-white/10 text-[11px] font-semibold"
+                        title="Zoom Out"
+                      >
+                        Zoom -
+                      </button>
+                    </div>
+
                     {/* Close Button */}
                     <button
-                      onClick={() => setIsLightboxOpen(false)}
+                      onClick={() => {
+                        setIsLightboxOpen(false);
+                        setZoomScale(1);
+                        setZoomOffset({ x: 0, y: 0 });
+                      }}
                       className="absolute top-4 right-4 p-2.5 bg-black/50 hover:bg-black/80 text-white rounded-full transition-all border border-white/10 z-20 cursor-pointer"
                       aria-label="Close Lightbox"
                     >
@@ -576,7 +685,11 @@ export default function PostCard({
                     {/* Left Arrow Button */}
                     {images.length > 1 && (
                       <button
-                        onClick={() => setLightboxIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                        onClick={() => {
+                          setZoomScale(1);
+                          setZoomOffset({ x: 0, y: 0 });
+                          setLightboxIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                        }}
                         className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer"
                         aria-label="Previous image"
                       >
@@ -587,7 +700,11 @@ export default function PostCard({
                     {/* Right Arrow Button */}
                     {images.length > 1 && (
                       <button
-                        onClick={() => setLightboxIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                        onClick={() => {
+                          setZoomScale(1);
+                          setZoomOffset({ x: 0, y: 0 });
+                          setLightboxIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                        }}
                         className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer"
                         aria-label="Next image"
                       >
@@ -596,7 +713,7 @@ export default function PostCard({
                     )}
 
                     {/* Counter Overlay */}
-                    <div className="absolute bottom-4 left-4 right-4 text-center z-10">
+                    <div className="absolute bottom-4 left-4 right-4 text-center z-10 font-sans">
                       <div className="inline-block px-3 py-1.5 bg-black/60 border border-white/10 rounded-full text-xs font-semibold text-white/95 backdrop-blur-md">
                         Image {activeIndex + 1} of {images.length}
                       </div>
@@ -609,17 +726,21 @@ export default function PostCard({
                       className="bg-black/40 border-t md:border-t-0 md:border-l border-white/10 w-full md:w-[200px] max-h-[30vh] md:max-h-full overflow-y-auto overflow-x-auto md:overflow-x-hidden p-4 shrink-0 flex md:flex-col gap-3 justify-center md:justify-start items-center"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="hidden md:block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 w-full text-center md:text-left">
+                      <div className="hidden md:block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 w-full text-center md:text-left font-sans">
                         Project Gallery
                       </div>
                       <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible w-full pb-1 md:pb-0">
                         {images.map((img, idx) => (
                           <button
                             key={idx}
-                            onClick={() => setLightboxIndex(idx)}
+                            onClick={() => {
+                              setZoomScale(1);
+                              setZoomOffset({ x: 0, y: 0 });
+                              setLightboxIndex(idx);
+                            }}
                             className={`relative w-14 h-14 md:w-full md:h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all duration-350 cursor-pointer ${
                               idx === activeIndex
-                                ? 'border-[#1877f2] scale-[1.03] shadow-[0_0_12px_rgba(24,119,242,0.4)]'
+                                ? 'border-[#4f46e5] scale-[1.03] shadow-[0_0_12px_rgba(79,70,229,0.4)]'
                                 : 'border-white/10 hover:border-white/30 brightness-75 hover:brightness-100'
                             }`}
                           >
@@ -644,7 +765,7 @@ export default function PostCard({
         <div className="flex items-center gap-1.5">
           {post.likesCount > 0 && (
             <div className="flex items-center gap-1">
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1877f2] hover:bg-blue-600 shadow-sm cursor-pointer border border-white">
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#4f46e5] hover:bg-indigo-700 shadow-sm cursor-pointer border border-white">
                 <ThumbsUp className="w-3 h-3 text-white fill-white" />
               </span>
               <span className="font-medium cursor-pointer hover:underline">
@@ -672,14 +793,14 @@ export default function PostCard({
         <button
           onClick={() => onLike(post.id)}
           className={`flex-1 flex items-center justify-center gap-2 h-10 hover:bg-gray-100 rounded-md transition-all active:scale-[0.98] ${
-            hasLiked ? 'text-[#1877f2]' : 'text-gray-650'
+            hasLiked ? 'text-[#4f46e5]' : 'text-gray-650'
           }`}
         >
           <motion.div
             animate={hasLiked ? { scale: [1, 1.25, 1] } : {}}
             transition={{ duration: 0.25 }}
           >
-            <ThumbsUp className={`w-5 h-5 ${hasLiked ? 'fill-[#1877f2]' : ''}`} />
+            <ThumbsUp className={`w-5 h-5 ${hasLiked ? 'fill-[#4f46e5]' : ''}`} />
           </motion.div>
           <span>Like</span>
         </button>
@@ -688,7 +809,7 @@ export default function PostCard({
         <button
           onClick={() => setShowComments(!showComments)}
           className={`flex-1 flex items-center justify-center gap-2 h-10 hover:bg-gray-100 rounded-md transition-colors ${
-            showComments ? 'text-[#1877f2] bg-blue-50/40' : 'text-gray-650'
+            showComments ? 'text-[#4f46e5] bg-indigo-50/40' : 'text-gray-650'
           }`}
         >
           <MessageSquare className="w-5 h-5" />

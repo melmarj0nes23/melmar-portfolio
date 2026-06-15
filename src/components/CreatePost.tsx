@@ -86,7 +86,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
     <div className="bg-white rounded-lg border border-gray-200 shadow p-4 mb-4" id="fb-create-post">
       {/* Title / Header of Card */}
       <div className="flex items-center gap-2 pb-3 mb-3 border-b border-gray-200 font-sans text-xs font-semibold text-gray-500 uppercase tracking-wider">
-        <FolderGit2 className="w-4 h-4 text-blue-500" />
+        <FolderGit2 className="w-4 h-4 text-indigo-500" />
         <span>Create Portfolio Project Post</span>
       </div>
 
@@ -115,7 +115,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                 placeholder="Project Title (e.g., Chess Engine, Dev Dashboard)"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1877f2] focus:border-transparent text-sm font-sans text-gray-900 font-medium placeholder-gray-400"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#4f46e5] focus:border-transparent text-sm font-sans text-gray-900 font-medium placeholder-gray-400"
                 maxLength={80}
                 required
               />
@@ -125,7 +125,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                 placeholder="What is this project about? Write a classic timeline update detailing challenges, successes, and architecture..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1877f2] focus:border-transparent text-sm font-sans text-gray-700 placeholder-gray-400 leading-relaxed resize-none"
+                className="w-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#4f46e5] focus:border-transparent text-sm font-sans text-gray-700 placeholder-gray-400 leading-relaxed resize-none"
                 maxLength={20000}
                 required
               />
@@ -136,7 +136,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                 placeholder="Tags (comma-separated: e.g. React, Node, TypeScript)"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-205 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#1877f2] focus:border-transparent text-xs font-sans text-gray-600 placeholder-gray-400"
+                className="w-full bg-gray-50 border border-gray-205 rounded-lg py-2 px-3 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#4f46e5] focus:border-transparent text-xs font-sans text-gray-600 placeholder-gray-400"
               />
 
               {/* Multiple Image URL Input Group */}
@@ -154,7 +154,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                         handleAddUrl();
                       }
                     }}
-                    className="flex-grow bg-white border border-gray-200 rounded-lg py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-[#1877f2] text-xs font-sans text-gray-600 placeholder-gray-400"
+                    className="flex-grow bg-white border border-gray-200 rounded-lg py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-[#4f46e5] text-xs font-sans text-gray-600 placeholder-gray-400"
                   />
                   <button
                     type="button"
@@ -193,7 +193,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                   <button type="button" className="p-2 hover:bg-gray-100 rounded-full text-green-500" title="Photo/Video Link">
                     <Image className="w-5 h-5" />
                   </button>
-                  <button type="button" className="p-2 hover:bg-gray-100 rounded-full text-blue-500" title="Tags">
+                  <button type="button" className="p-2 hover:bg-gray-100 rounded-full text-indigo-500" title="Tags">
                     <Tag className="w-5 h-5" />
                   </button>
                   <button type="button" className="p-2 hover:bg-gray-100 rounded-full text-yellow-500" title="Feeling/Activity">
@@ -211,7 +211,7 @@ export default function CreatePost({ userAvatar, userName, onAddPost }: CreatePo
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-1.5 bg-[#1877f2] hover:bg-[#166fe5] disabled:bg-blue-300 text-white text-xs font-semibold rounded-md shadow flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-1.5 bg-[#4f46e5] hover:bg-indigo-750 disabled:bg-indigo-300 text-white text-xs font-semibold rounded-md shadow flex items-center gap-1.5 transition-colors"
                   >
                     {isSubmitting ? 'Posting...' : 'Post Project'}
                     <Send className="w-3.5 h-3.5" />

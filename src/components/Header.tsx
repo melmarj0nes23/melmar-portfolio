@@ -129,11 +129,11 @@ export default function Header({
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Temporary high contrast highlighting border
-      element.classList.remove('ring-4', 'ring-blue-500/50');
-      element.classList.add('ring-4', 'ring-blue-500/50', 'transition-all', 'duration-300');
+      element.classList.remove('ring-4', 'ring-indigo-500/50');
+      element.classList.add('ring-4', 'ring-indigo-500/50', 'transition-all', 'duration-300');
       
       setTimeout(() => {
-        element.classList.remove('ring-4', 'ring-blue-500/50');
+        element.classList.remove('ring-4', 'ring-indigo-500/50');
       }, 1800);
     }
   };
@@ -158,7 +158,7 @@ export default function Header({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-[#1877f2] shadow-md z-50 flex items-center justify-between px-4" id="fb-header">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-[#4f46e5] shadow-md z-50 flex items-center justify-between px-4" id="fb-header">
       {/* Left-most section: Profile Badge / Avatar */}
       <div className="flex items-center flex-shrink-0">
         <div 
@@ -196,7 +196,7 @@ export default function Header({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsDropdownOpen(true)}
-            className="w-full h-9 pl-9 pr-4 bg-white/10 text-white placeholder-white/70 rounded-full focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 text-sm transition-all border border-transparent focus:border-blue-300"
+            className="w-full h-9 pl-9 pr-4 bg-white/10 text-white placeholder-white/70 rounded-full focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 text-sm transition-all border border-transparent focus:border-indigo-300"
           />
 
           {/* Search Dropdown / Autocomplete Recommendations */}
@@ -217,7 +217,7 @@ export default function Header({
                         <button 
                           type="button" 
                           onClick={() => setSearchQuery('')}
-                          className="hover:text-blue-500 font-semibold cursor-pointer"
+                          className="hover:text-indigo-500 font-semibold cursor-pointer"
                         >
                           Clear
                         </button>
@@ -228,7 +228,7 @@ export default function Header({
                         key={post.id}
                         type="button"
                         onClick={() => handleSelectPost(post.id, post.title)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors flex flex-col border-b border-gray-50 last:border-0 cursor-pointer"
+                        className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 transition-colors flex flex-col border-b border-gray-50 last:border-0 cursor-pointer"
                       >
                         <span className="font-semibold text-gray-800 line-clamp-1">{post.title}</span>
                         {post.tags && post.tags.length > 0 && (
@@ -280,7 +280,7 @@ export default function Header({
               >
                 <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                   <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Socials & Messages</span>
-                  <span className="text-[10px] bg-blue-100 text-[#1877f2] px-2 py-0.5 rounded-full font-semibold">Active</span>
+                  <span className="text-[10px] bg-indigo-100 text-[#4f46e5] px-2 py-0.5 rounded-full font-semibold">Active</span>
                 </div>
                 <div className="py-1.5 flex flex-col">
                   <a 
@@ -305,7 +305,7 @@ export default function Header({
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors text-sm font-semibold text-gray-700"
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#0a66c2]">
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-[#0a66c2]">
                       <Linkedin className="w-4.5 h-4.5" />
                     </div>
                     <div className="flex-grow flex flex-col">
@@ -321,7 +321,7 @@ export default function Header({
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors text-sm font-semibold text-gray-700"
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-50/70 flex items-center justify-center text-[#1877f2]">
+                    <div className="w-8 h-8 rounded-full bg-indigo-50/70 flex items-center justify-center text-[#4f46e5]">
                       <Facebook className="w-4.5 h-4.5" />
                     </div>
                     <div className="flex-grow flex flex-col">
@@ -379,23 +379,23 @@ export default function Header({
                 </div>
                 <div className="p-4 flex flex-col gap-3.5">
                   <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center text-[#1877f2] relative">
-                      <Award className="w-5 h-5 text-[#1877f2]" />
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-[#4f46e5] relative">
+                      <Award className="w-5 h-5 text-[#4f46e5]" />
                       <div className="absolute -bottom-1 -right-1 bg-yellow-400 p-0.5 rounded-full border border-white text-xs">⭐</div>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <p className="text-sm font-semibold leading-snug text-gray-800">
-                        Thank you for dropping by to my portfolio! You are the <span className="text-[#1877f2] font-bold underline">{getOrdinalSuffix(visitorOrdinal)}</span> visitor so far.
+                        Thank you for dropping by to my portfolio! You are the <span className="text-[#4f46e5] font-bold underline">{getOrdinalSuffix(visitorOrdinal)}</span> visitor so far.
                       </p>
                       <span className="text-[11px] text-gray-400 font-medium">Just now</span>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50/50 rounded-xl p-3 border border-blue-100/30 flex items-center justify-between">
+                  <div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100/30 flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-slate-600">Live Visitor Counter</span>
                     </div>
-                    <span className="text-lg font-black text-[#1877f2] bg-white px-3 py-1 rounded-lg shadow-sm border border-blue-100">
+                    <span className="text-lg font-black text-[#4f46e5] bg-white px-3 py-1 rounded-lg shadow-sm border border-indigo-100">
                       #{visitorCount}
                     </span>
                   </div>
@@ -433,17 +433,17 @@ export default function Header({
 
                 <div className="p-4 flex flex-col">
                   <h4 className="text-xs font-bold text-gray-700 mb-3 flex items-center gap-1.5 border-b border-gray-100 pb-2">
-                    <span className="text-blue-600 font-bold">🚀</span> Visit my live projects:
+                    <span className="text-indigo-600 font-bold">🚀</span> Visit my live projects:
                   </h4>
 
                   {liveProjects.length > 0 ? (
                     <div className="flex flex-col gap-3 max-h-72 overflow-y-auto pr-1">
                       {liveProjects.map((proj) => (
-                        <div key={proj.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-150 hover:border-blue-200 transition-colors flex flex-col gap-1.5">
+                        <div key={proj.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-150 hover:border-indigo-200 transition-colors flex flex-col gap-1.5">
                           <button 
                             type="button" 
                             onClick={() => handleSelectPost(proj.id, proj.title)}
-                            className="text-left font-bold text-gray-900 text-xs hover:text-blue-600 hover:underline transition-colors focus:outline-none cursor-pointer"
+                            className="text-left font-bold text-gray-900 text-xs hover:text-indigo-600 hover:underline transition-colors focus:outline-none cursor-pointer"
                           >
                             {proj.title}
                           </button>
@@ -455,7 +455,7 @@ export default function Header({
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-[#1877f2] hover:underline font-medium flex items-center gap-1.5 break-all"
+                                className="text-xs text-[#4f46e5] hover:underline font-medium flex items-center gap-1.5 break-all"
                               >
                                 <span className="text-[10px] text-gray-400">🌐</span>
                                 <span className="flex-grow">{url}</span>
@@ -499,7 +499,7 @@ export default function Header({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header colored banner */}
-              <div className="h-28 bg-gradient-to-r from-[#1877f2] to-blue-600 relative flex items-end px-6 pb-4">
+              <div className="h-28 bg-gradient-to-r from-[#4f46e5] to-indigo-600 relative flex items-end px-6 pb-4">
                 {/* Sparkle icons for premium visual style */}
                 <div className="absolute top-3 right-12 text-white/25">
                   <Sparkles className="w-8 h-8" />
@@ -533,7 +533,7 @@ export default function Header({
                   <h3 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-1.5">
                     Hello! Welcome to my portfolio.
                   </h3>
-                  <p className="text-sm font-semibold text-[#1877f2]">
+                  <p className="text-sm font-semibold text-[#4f46e5]">
                     My name is Melmar Jones Velasco.
                   </p>
                 </div>
@@ -541,7 +541,7 @@ export default function Header({
                 {/* Metadata badges */}
                 <div className="flex flex-wrap gap-2.5 mb-5 border-y border-gray-100 py-3.5">
                   {userRole && (
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#1877f2] rounded-full text-xs font-semibold">
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-[#4f46e5] rounded-full text-xs font-semibold">
                       <GraduationCap className="w-3.5 h-3.5" />
                       <span>{userRole}</span>
                     </div>
@@ -557,9 +557,9 @@ export default function Header({
                 {/* Bio text section */}
                 {userBio && (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-150/60 leading-relaxed text-gray-700 text-sm font-medium relative italic">
-                    <span className="text-2xl font-serif text-[#1877f2] absolute -top-1 left-2 opacity-15 select-none leading-none">“</span>
+                    <span className="text-2xl font-serif text-[#4f46e5] absolute -top-1 left-2 opacity-15 select-none leading-none">“</span>
                     <p className="pl-4 pr-2">{userBio}</p>
-                    <span className="text-2xl font-serif text-[#1877f2] absolute -bottom-5 right-3 opacity-15 select-none leading-none">”</span>
+                    <span className="text-2xl font-serif text-[#4f46e5] absolute -bottom-5 right-3 opacity-15 select-none leading-none">”</span>
                   </div>
                 )}
 
@@ -567,7 +567,7 @@ export default function Header({
                 <button
                   type="button"
                   onClick={() => setShowGreeting(false)}
-                  className="mt-6 w-full py-2.5 bg-[#1877f2] hover:bg-[#166fe5] text-white font-semibold text-sm rounded-lg shadow-md transition-colors"
+                  className="mt-6 w-full py-2.5 bg-[#4f46e5] hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow-md transition-colors"
                 >
                   Nice to meet you!
                 </button>
