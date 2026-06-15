@@ -14,3 +14,19 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Prevent auto-zooming on iOS (iPhone/iPad) when focused on inputs and textareas */
+@media (max-width: 1024px) {
+  input,
+  textarea,
+  select,
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="search"],
+  input[type="number"],
+  input[type="tel"] {
+    font-size: 16px !important;
+  }
+}
+
