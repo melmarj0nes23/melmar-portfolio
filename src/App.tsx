@@ -1077,9 +1077,9 @@ export default function App() {
                     <div className="flex-1 max-w-md bg-slate-900 border border-white/10 rounded-lg h-7 px-3 flex items-center justify-between text-slate-400 text-[11px] font-mono select-none">
                       <div className="flex items-center gap-1.5 text-slate-500">
                         <Lock className="w-3 h-3 text-emerald-500 stroke-[2.5]" />
-                        <span className="text-slate-300 tracking-wide font-medium">melmar.dev</span>
+                        <span className="text-slate-300 tracking-wide font-medium">melmar-portfolio.pages.dev</span>
                         <span className="text-slate-600 font-sans">/</span>
-                        <span className="text-slate-400 font-sans tracking-tight">workspace/media</span>
+                        <span className="text-slate-400 font-sans tracking-tight">projects</span>
                       </div>
                       <RotateCw className="w-3 h-3 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors" />
                     </div>
