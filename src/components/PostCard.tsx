@@ -620,9 +620,14 @@ export default function PostCard({
                     <img
                       src={images[activeIndex]}
                       alt={`${post.title} full view ${activeIndex + 1}`}
-                      className="max-w-full max-h-full object-contain rounded shadow-2xl transition-transform duration-100 ease-out select-none"
+                      className="max-w-full max-h-full object-contain rounded shadow-2xl select-none"
                       style={{
-                        transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
+                        transform: `translate3d(${zoomOffset.x}px, ${zoomOffset.y}px, 0px) scale(${zoomScale})`,
+                        transition: (dragStart !== null || pinchStartDist !== null) ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                        transformStyle: 'preserve-3d',
+                        willChange: 'transform',
                         touchAction: zoomScale > 1 ? 'none' : 'pan-y',
                         cursor: zoomScale > 1 ? 'grab' : 'default'
                       }}

@@ -865,9 +865,14 @@ export default function App() {
               <img 
                 src={activeLightbox.urls[activeLightbox.index]} 
                 alt={`Screenshot projection ${activeLightbox.index + 1}`}
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/5 transition-transform duration-100 ease-out select-none"
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/5 select-none"
                 style={{
-                  transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
+                  transform: `translate3d(${zoomOffset.x}px, ${zoomOffset.y}px, 0px) scale(${zoomScale})`,
+                  transition: (dragStart !== null || pinchStartDist !== null) ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transformStyle: 'preserve-3d',
+                  willChange: 'transform',
                   touchAction: zoomScale > 1 ? 'none' : 'pan-y',
                   cursor: zoomScale > 1 ? 'grab' : 'default'
                 }}
