@@ -96,7 +96,7 @@ export default function ProfileHeader({
         {isOwner && (
           <button
             onClick={() => setIsEditingCover(true)}
-            className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded flex items-center gap-1.5 transition-colors shadow"
+            className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-2 rounded flex items-center gap-1.5 transition-colors shadow z-20"
           >
             <Camera className="w-3.5 h-3.5" />
             <span>Edit Cover Photo</span>
