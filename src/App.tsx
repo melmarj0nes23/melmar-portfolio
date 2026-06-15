@@ -18,7 +18,7 @@ import ProfileHeader from './components/ProfileHeader';
 import IntroSidebar from './components/IntroSidebar';
 import CreatePost from './components/CreatePost';
 import PostCard from './components/PostCard';
-import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp, Sparkles, Code2 } from 'lucide-react';
+import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp, Sparkles, Code2, Wifi, Battery, RotateCw, Laptop, Smartphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Enums and Interfaces required by Firebase Integration Skill for Error Diagnostics
@@ -146,6 +146,28 @@ export default function App() {
   const [visitorCount, setVisitorCount] = useState<number>(1);
   const [visitorOrdinal, setVisitorOrdinal] = useState<number>(1);
   const [activeLightbox, setActiveLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+  const [imageAspect, setImageAspect] = useState<'landscape' | 'portrait'>('landscape');
+  const [imageLoading, setImageLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (activeLightbox) {
+      setImageLoading(true);
+      const currentUrl = activeLightbox.urls[activeLightbox.index];
+      const img = new Image();
+      img.onload = () => {
+        if (img.naturalWidth >= img.naturalHeight) {
+          setImageAspect('landscape');
+        } else {
+          setImageAspect('portrait');
+        }
+        setImageLoading(false);
+      };
+      img.onerror = () => {
+        setImageLoading(false);
+      };
+      img.src = currentUrl;
+    }
+  }, [activeLightbox?.index, activeLightbox?.urls]);
 
   // Mobile Floating Scroll to Top State & Effect
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -1014,28 +1036,127 @@ export default function App() {
             }}
           >
             <div 
-              className="relative w-full h-full max-w-4xl max-h-[85vh] flex items-center justify-center px-4 overflow-hidden" 
+              className="relative w-full h-full max-w-[96vw] max-h-[94vh] flex flex-col items-center justify-center px-2 sm:px-4 overflow-hidden" 
               onClick={e => e.stopPropagation()}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={() => handleTouchEnd(activeLightbox.urls.length)}
             >
-              <img 
-                src={activeLightbox.urls[activeLightbox.index]} 
-                alt={`Screenshot projection ${activeLightbox.index + 1}`}
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl border border-white/5 select-none"
-                style={{
-                  transform: `translate3d(${zoomOffset.x}px, ${zoomOffset.y}px, 0px) scale(${zoomScale})`,
-                  transition: (dragStart !== null || pinchStartDist !== null) ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform',
-                  touchAction: zoomScale > 1 ? 'none' : 'pan-y',
-                  cursor: zoomScale > 1 ? 'grab' : 'default'
-                }}
-                referrerPolicy="no-referrer"
-              />
+              {imageLoading ? (
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <div className="w-10 h-10 border-4 border-indigo-500/25 border-t-indigo-500 rounded-full animate-spin" />
+                  <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest animate-pulse">
+                    Rendering High-Fidelity Mockup...
+                  </span>
+                </div>
+              ) : imageAspect === 'landscape' ? (
+                /* Landscape - Premium Mock Safari Browser Wrapper */
+                <div 
+                  className="w-full max-w-[94vw] lg:max-w-6xl xl:max-w-7xl flex flex-col bg-slate-950 rounded-xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] border border-white/10 mx-auto"
+                  style={{
+                    transform: `translate3d(${zoomOffset.x}px, ${zoomOffset.y}px, 0px) scale(${zoomScale})`,
+                    transition: (dragStart !== null || pinchStartDist !== null) ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transformStyle: 'preserve-3d',
+                    willChange: 'transform',
+                    touchAction: zoomScale > 1 ? 'none' : 'pan-y',
+                    cursor: zoomScale > 1 ? 'grab' : 'default'
+                  }}
+                >
+                  {/* Safari Header */}
+                  <div className="h-10 sm:h-11 bg-slate-950 px-4 flex items-center justify-between border-b border-white/5 select-none shrink-0 border-t-0 border-l-0 border-r-0">
+                    {/* Mac Window Controls */}
+                    <div className="flex items-center gap-2 w-1/4">
+                      <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                      <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                      <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                    </div>
+                    
+                    {/* URL Bar */}
+                    <div className="flex-1 max-w-md bg-slate-900 border border-white/10 rounded-lg h-7 px-3 flex items-center justify-between text-slate-400 text-[11px] font-mono select-none">
+                      <div className="flex items-center gap-1.5 text-slate-500">
+                        <Lock className="w-3 h-3 text-emerald-500 stroke-[2.5]" />
+                        <span className="text-slate-300 tracking-wide font-medium">melmar.dev</span>
+                        <span className="text-slate-600 font-sans">/</span>
+                        <span className="text-slate-400 font-sans tracking-tight">workspace/media</span>
+                      </div>
+                      <RotateCw className="w-3 h-3 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors" />
+                    </div>
+
+                    {/* Window Controls Right */}
+                    <div className="flex items-center justify-end gap-3 w-1/4">
+                      <Laptop className="w-4 h-4 text-indigo-400" />
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-650" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-650" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-650" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Canvas Body */}
+                  <div className="relative p-2 bg-slate-900/65 flex items-center justify-center overflow-hidden max-h-[82vh]">
+                    <img 
+                      src={activeLightbox.urls[activeLightbox.index]} 
+                      alt={`Screenshot projection ${activeLightbox.index + 1}`}
+                      className="max-w-full max-h-[78vh] object-contain rounded-md select-none shadow-inner"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Portrait - Premium Mobile/Smartphone Chassis */
+                <div 
+                  className="relative mx-auto rounded-[24px] sm:rounded-[32px] border-4 sm:border-[6px] border-slate-800 bg-[#070913] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col max-h-[78vh] max-w-[90vw] md:max-w-sm"
+                  style={{
+                    transform: `translate3d(${zoomOffset.x}px, ${zoomOffset.y}px, 0px) scale(${zoomScale})`,
+                    transition: (dragStart !== null || pinchStartDist !== null) ? 'none' : 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transformStyle: 'preserve-3d',
+                    willChange: 'transform',
+                    touchAction: zoomScale > 1 ? 'none' : 'pan-y',
+                    cursor: zoomScale > 1 ? 'grab' : 'default'
+                  }}
+                >
+                  {/* Smartphone side button accents - subtle & thin */}
+                  <div className="absolute -left-[4px] top-16 w-[2px] h-8 bg-slate-700/80 rounded-r" />
+                  <div className="absolute -left-[4px] top-28 w-[2px] h-10 bg-slate-700/80 rounded-r" />
+                  <div className="absolute -right-[4px] top-24 w-[2px] h-12 bg-slate-700/80 rounded-l" />
+
+                  {/* Premium status bar */}
+                  <div className="h-8 px-4 sm:px-5 flex items-center justify-between text-white/95 select-none text-[10px] font-semibold relative z-20 shrink-0">
+                    <span className="font-sans leading-none">9:41</span>
+                    
+                    {/* Dynamic Island Notch */}
+                    <div className="absolute top-1.5 w-14 h-3.5 bg-black rounded-full left-1/2 -translate-x-1/2 flex items-center justify-center border border-white/5 shadow-inner">
+                      <div className="w-1 h-1 rounded-full bg-[#1c1d3a] absolute right-3" />
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5 text-white/90">
+                      <Wifi className="w-3 h-3" />
+                      <Smartphone className="w-2.5 h-2.5 text-indigo-400" />
+                      <Battery className="w-3.5 h-3.5 select-none stroke-[2]" />
+                    </div>
+                  </div>
+
+                  {/* Content space */}
+                  <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-slate-950 p-1 sm:p-1.5">
+                    <img 
+                      src={activeLightbox.urls[activeLightbox.index]} 
+                      alt={`Screenshot projection ${activeLightbox.index + 1}`}
+                      className="max-h-[66vh] w-auto max-w-full object-contain rounded-xl sm:rounded-2xl select-none"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+
+                  {/* Indicator bottom line */}
+                  <div className="h-4 relative z-20 flex justify-center items-center pointer-events-none select-none shrink-0">
+                    <div className="h-0.5 w-20 bg-white/45 rounded-full" />
+                  </div>
+                </div>
+              )}
 
               {/* Explicit Zoom Controller overlay */}
               <div className="absolute top-4 left-4 flex gap-1.5 z-50">
