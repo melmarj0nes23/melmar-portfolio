@@ -77,11 +77,20 @@ export default function ProfileHeader({
   return (
     <div className="bg-white shadow border border-gray-200 rounded-lg max-w-6xl mx-auto mt-14 relative" id="fb-profile-header">
       {/* Cover Photo */}
-      <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200 rounded-t-lg overflow-hidden">
+      <div className="relative h-48 sm:h-64 md:h-80 bg-slate-900 rounded-t-lg overflow-hidden flex items-center justify-center" id="fb-cover-container">
+        {/* Soft, blurred background replica of the cover photo for premium framing */}
+        <img
+          src={profile.coverPhoto}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover blur-md opacity-40 scale-105 pointer-events-none select-none"
+          aria-hidden="true"
+          referrerPolicy="no-referrer"
+        />
+        {/* Entire cover image fully visible and centered using contain */}
         <img
           src={profile.coverPhoto}
           alt="Cover Backplate"
-          className="w-full h-full object-cover"
+          className="relative z-10 w-full h-full object-contain"
           referrerPolicy="no-referrer"
         />
         {isOwner && (
