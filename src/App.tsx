@@ -1222,7 +1222,7 @@ export default function App() {
                       index: prev.index === 0 ? prev.urls.length - 1 : prev.index - 1
                     } : null);
                   }}
-                  className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50"
+                  className="hidden sm:flex absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50 items-center justify-center"
                   title="Previous image"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -1240,7 +1240,7 @@ export default function App() {
                       index: prev.index === prev.urls.length - 1 ? 0 : prev.index + 1
                     } : null);
                   }}
-                  className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50"
+                  className="hidden sm:flex absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm cursor-pointer z-50 items-center justify-center"
                   title="Next image"
                 >
                   <ChevronRight className="w-6 h-6" />

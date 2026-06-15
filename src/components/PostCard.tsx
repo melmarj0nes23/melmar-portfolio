@@ -821,7 +821,7 @@ export default function PostCard({
                           setZoomOffset({ x: 0, y: 0 });
                           setLightboxIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
                         }}
-                        className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer"
+                        className="hidden sm:flex absolute left-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer items-center justify-center"
                         aria-label="Previous image"
                       >
                         <ChevronLeft className="w-6 h-6" />
@@ -836,7 +836,7 @@ export default function PostCard({
                           setZoomOffset({ x: 0, y: 0 });
                           setLightboxIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
                         }}
-                        className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer"
+                        className="hidden sm:flex absolute right-4 p-3 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all border border-white/5 backdrop-blur-sm z-20 cursor-pointer items-center justify-center"
                         aria-label="Next image"
                       >
                         <ChevronRight className="w-6 h-6" />
