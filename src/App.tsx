@@ -18,7 +18,7 @@ import ProfileHeader from './components/ProfileHeader';
 import IntroSidebar from './components/IntroSidebar';
 import CreatePost from './components/CreatePost';
 import PostCard from './components/PostCard';
-import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
+import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp, Sparkles, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Enums and Interfaces required by Firebase Integration Skill for Error Diagnostics
@@ -93,6 +93,55 @@ export default function App() {
   const [commentsMap, setCommentsMap] = useState<Record<string, Comment[]>>({});
   const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
+
+  // Smooth progress animation up to 98%
+  useEffect(() => {
+    let progressInterval: NodeJS.Timeout;
+    if (showSplash) {
+      progressInterval = setInterval(() => {
+        setLoadingProgress(prev => {
+          if (prev >= 98) {
+            if (!isLoading) {
+              return 100;
+            }
+            return 98;
+          }
+          const increment = Math.floor(Math.random() * 4) + 1;
+          const nextVal = prev + increment;
+          return nextVal > 98 ? 98 : nextVal;
+        });
+      }, 35);
+    }
+    return () => clearInterval(progressInterval);
+  }, [showSplash, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && showSplash) {
+      const finishTimer = setTimeout(() => {
+        setLoadingProgress(100);
+        const hideTimer = setTimeout(() => {
+          setShowSplash(false);
+        }, 500);
+        return () => {
+          clearTimeout(hideTimer);
+        };
+      }, 400);
+      return () => {
+        clearTimeout(finishTimer);
+      };
+    }
+  }, [isLoading, showSplash]);
+
+  const getSplashText = (progress: number) => {
+    if (progress < 25) return 'Establishing connection to portfolio...';
+    if (progress < 55) return 'Syncing newsfeed posts & project cards...';
+    if (progress < 75) return 'Loading high-fidelity portfolio media...';
+    if (progress < 98) return 'Aligning dynamic layout modules...';
+    if (progress < 100) return 'Finalizing secure handshake...';
+    return 'Ready! Welcome to the workspace.';
+  };
 
   const [visitorCount, setVisitorCount] = useState<number>(1);
   const [visitorOrdinal, setVisitorOrdinal] = useState<number>(1);
@@ -643,6 +692,115 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f4f6fa] pb-10 selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Premium Elegant Splash Screen */}
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div
+            key="premium-splash-screen"
+            initial={{ opacity: 1 }}
+            exit={{ 
+              opacity: 0,
+              y: -40,
+              transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+            }}
+            className="fixed inset-0 bg-[#070913] z-[999999] flex flex-col items-center justify-center overflow-hidden font-sans select-none"
+          >
+            {/* Ambient Background Radial Glows */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.18)_0%,transparent_65%)] pointer-events-none" />
+            <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative flex flex-col items-center justify-center max-w-md w-full px-6 text-center z-10">
+              
+              {/* Premium Logo Frame */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="relative mb-6"
+              >
+                {/* Dual glowing halo rings */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-indigo-500/20 to-violet-500/20 blur-xl animate-pulse" />
+                <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-500 opacity-30 animate-[spin_8s_linear_infinite]" />
+                
+                {/* Brand Badge */}
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-slate-900 border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl">
+                  <Code2 className="w-8 h-8 sm:w-10 sm:h-10 text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-violet-400" />
+                  <motion.div 
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+                    className="absolute -top-1 -right-1"
+                  >
+                    <Sparkles className="w-4 h-4 text-indigo-400" />
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Title Section */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col gap-1 sm:gap-2"
+              >
+                <h1 className="text-xl sm:text-2xl font-bold tracking-[0.2em] uppercase text-white bg-clip-text bg-gradient-to-r from-white via-white/95 to-white/70 font-sans">
+                  Melmar Jones Velasco
+                </h1>
+                <p className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-[0.3em] font-sans">
+                  Aspiring Full-Stack Developer
+                </p>
+              </motion.div>
+
+              {/* Loading Meter Console */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="w-full mt-12 bg-slate-900/60 border border-white/5 rounded-xl p-4 backdrop-blur-md"
+              >
+                {/* Progress Value Counter */}
+                <div className="flex justify-between items-center mb-2.5 font-mono text-[11px]">
+                  <span className="text-indigo-400 font-semibold uppercase tracking-wider">
+                    {loadingProgress === 100 ? 'System Armed' : 'Booting Applet'}
+                  </span>
+                  <span className="text-white/60 font-medium">
+                    {loadingProgress}%
+                  </span>
+                </div>
+
+                {/* Progress Track */}
+                <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-indigo-500 via-indigo-400 to-violet-500 rounded-full shadow-[0_0_12px_rgba(99,102,241,0.6)]" 
+                    style={{ width: `${loadingProgress}%` }}
+                    transition={{ ease: "easeOut" }}
+                  />
+                </div>
+
+                {/* Micro Cues & Literal Logging Messages */}
+                <div className="mt-3 text-left">
+                  <p className="text-[10px] text-slate-400 h-4 font-mono select-none overflow-hidden text-ellipsis whitespace-nowrap">
+                    <span className="text-indigo-500 mr-1.5">&gt;</span>
+                    {getSplashText(loadingProgress)}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Status footer credits (Clean and understated) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                className="absolute bottom-6 left-4 right-4 text-[10px] font-mono text-slate-500 tracking-wider font-medium uppercase"
+              >
+                Hands-On Learning &bull; Alcala, PH
+              </motion.div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header bar */}
       <Header 
         userName={profile.name} 
