@@ -1074,14 +1074,14 @@ export default function App() {
                     </div>
                     
                     {/* URL Bar */}
-                    <div className="flex-1 max-w-md bg-slate-900 border border-white/10 rounded-lg h-7 px-3 flex items-center justify-between text-slate-400 text-[11px] font-mono select-none">
-                      <div className="flex items-center gap-1.5 text-slate-500">
-                        <Lock className="w-3 h-3 text-emerald-500 stroke-[2.5]" />
-                        <span className="text-slate-300 tracking-wide font-medium">melmar-portfolio.pages.dev</span>
-                        <span className="text-slate-600 font-sans">/</span>
-                        <span className="text-slate-400 font-sans tracking-tight">projects</span>
+                    <div className="flex-1 max-w-md bg-slate-900 border border-white/10 rounded-lg h-7 px-2 sm:px-3 flex items-center justify-between text-slate-400 text-[10px] sm:text-[11px] font-mono select-none overflow-hidden mx-1.5 sm:mx-0">
+                      <div className="flex items-center gap-1 sm:gap-1.5 text-slate-500 min-w-0 overflow-hidden whitespace-nowrap">
+                        <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-500 stroke-[2.5] shrink-0" />
+                        <span className="text-slate-300 tracking-wide font-medium truncate">melmar-portfolio.pages.dev</span>
+                        <span className="text-slate-600 font-sans shrink-0">/</span>
+                        <span className="text-slate-400 font-sans tracking-tight shrink-0">projects</span>
                       </div>
-                      <RotateCw className="w-3 h-3 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors" />
+                      <RotateCw className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-500 cursor-pointer hover:text-slate-300 transition-colors shrink-0 ml-1.5" />
                     </div>
 
                     {/* Window Controls Right */}
