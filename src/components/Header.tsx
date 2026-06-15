@@ -427,14 +427,11 @@ export default function Header({
                 className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-150 overflow-hidden z-[999] text-gray-800 flex flex-col"
               >
                 <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Live Links Menu</span>
+                  <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Visit my live projects:</span>
                   <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Live URLs</span>
                 </div>
 
                 <div className="p-4 flex flex-col">
-                  <h4 className="text-xs font-bold text-gray-700 mb-3 flex items-center gap-1.5 border-b border-gray-100 pb-2">
-                    <span className="text-indigo-600 font-bold">🚀</span> Visit my live projects:
-                  </h4>
 
                   {liveProjects.length > 0 ? (
                     <div className="flex flex-col gap-3 max-h-72 overflow-y-auto pr-1">
