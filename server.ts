@@ -12,7 +12,13 @@ const app = express();
 const PORT = 3000;
 
 // Enable CORS for cross-domain requests
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+app.options("*", cors());
 
 // Initialize Google Gen AI
 const ai = new GoogleGenAI({
