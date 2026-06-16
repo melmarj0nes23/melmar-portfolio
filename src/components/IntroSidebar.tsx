@@ -160,6 +160,82 @@ export default function IntroSidebar({ profile, posts, onPhotoClick, onSkillClic
         </div>
       </div>
 
+      {/* Box 1.5: Work Experience / Career Journey */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow" id="work-experience-card">
+        <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+          <div className="flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-indigo-600 shrink-0 animate-[pulse_3s_infinite]" />
+            <h3 className="text-base font-bold font-sans text-gray-900">Work Experience</h3>
+          </div>
+          <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+            Career Timeline
+          </span>
+        </div>
+
+        {/* Professional Promotion track timeline */}
+        <div className="relative pl-3.5 border-l-2 border-indigo-100 ml-1.5 flex flex-col gap-5">
+          {[
+            {
+              role: "Freelance Web Developer & Digital Architect",
+              company: "Self-Employed",
+              period: "Jul 2024 - Present",
+              desc: "• End-to-End Architecture: Conceptualize, wireframe, and design complete website layouts and user experiences (UX/UI) tailored to client specifications.\n• AI-Accelerated Development: Leverage advanced AI copilots and development tools for rapid code implementation, debugging, and content generation, significantly reducing project delivery timelines.\n• Content & Strategy: Oversee full content direction, structuring site copy and visual hierarchy to maximize user engagement and SEO performance."
+            },
+            {
+              role: "Workforce Scheduler",
+              company: "VXI Global Holdings, B. V. (PHILIPPINES)",
+              period: "Dec 2022 - Jul 2024",
+              desc: "Managed call volume forecasts, personnel rostering, and shift optimizations to ensure consistent SLA performance."
+            },
+            {
+              role: "Workforce Real Time Analyst",
+              company: "VXI Global Holdings, B. V. (PHILIPPINES)",
+              period: "Oct 2018 - Dec 2022",
+              desc: "Supervised live queues, audited agent states, managed service levels, and directed immediate intraday staffing adjustments."
+            },
+            {
+              role: "Subject Matter Expert",
+              company: "VXI Global Holdings, B. V. (PHILIPPINES)",
+              period: "Jul 2018 - Oct 2018",
+              desc: "Provided queue leadership, coached support agents on product details, and facilitated immediate escalation responses."
+            },
+            {
+              role: "Customer Service Representative",
+              company: "VXI Global Holdings, B. V. (PHILIPPINES)",
+              period: "Apr 2017 - Jan 2018",
+              desc: "Handled billing queries, addressed customer complaints, and sustained superior case quality resolution scores."
+            },
+            {
+              role: "Technical Support Representative",
+              company: "VXI Global Holdings, B. V. (PHILIPPINES)",
+              period: "Apr 2015 - Apr 2017",
+              desc: "Guided customers through structured technical diagnostics, internet connectivity, and network repair tasks."
+            }
+          ].map((exp, idx) => (
+            <div key={idx} className="relative group">
+              {/* Chronological Dot */}
+              <div className="absolute -left-[19.5px] top-1 w-2.5 h-2.5 rounded-full bg-white border-2 border-indigo-500 group-hover:bg-indigo-600 transition-colors" />
+              
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug">
+                  {exp.role}
+                </span>
+                <span className="text-[10px] text-indigo-700 font-extrabold tracking-wide mt-0.5">
+                  {exp.company}
+                </span>
+                <span className="text-[10px] text-gray-400 font-semibold mb-1 flex items-center gap-1 mt-1">
+                  <Clock className="w-3 h-3 text-gray-400 shrink-0" />
+                  {exp.period}
+                </span>
+                <p className="text-[11.5px] text-gray-600 leading-relaxed font-sans whitespace-pre-line select-text mt-1">
+                  {exp.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Box 2: Photos Grid (Sourced dynamically from real project portfolios) */}
       <div className="bg-white p-4 rounded-lg border border-gray-200 shadow lg:sticky lg:top-[80px]">
         <div className="flex items-center justify-between mb-3">
