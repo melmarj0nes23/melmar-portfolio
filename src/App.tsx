@@ -952,7 +952,6 @@ export default function App() {
       {/* Visual Footer with Back to Top button */}
       <footer className="w-full bg-gray-100 border-t border-gray-200 py-8 px-4 mt-12 text-center text-xs text-gray-500 font-sans select-none flex flex-col items-center gap-2" id="portfolio-footer">
         <p className="font-semibold text-gray-650">Melmar Jones Velasco &copy; {new Date().getFullYear()}</p>
-        <p className="text-[11px] text-gray-400">Facebook-themed Interactive Developer Portfolio</p>
         <button
           onClick={scrollToTop}
           className="mt-2.5 flex items-center gap-1.5 px-4 py-1.5 bg-white hover:bg-gray-50 border border-gray-250 text-gray-700 font-bold text-xs rounded-full transition-all active:scale-95 shadow-sm cursor-pointer hover:shadow"
