@@ -3,12 +3,16 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import cors from "cors";
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+// Enable CORS for cross-domain requests
+app.use(cors());
 
 // Initialize Google Gen AI
 const ai = new GoogleGenAI({

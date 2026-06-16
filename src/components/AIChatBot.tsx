@@ -83,7 +83,8 @@ export default function AIChatBot({ profile, posts }: AIChatBotProps) {
     setErrorMsg(null);
 
     try {
-      const response = await fetch('/api/chat', {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const response = await fetch(`${apiBaseUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -242,7 +243,7 @@ export default function AIChatBot({ profile, posts }: AIChatBotProps) {
                 onChange={(e) => setInputMsg(e.target.value)}
                 disabled={isLoading}
                 placeholder="Ask about skills, projects, background..."
-                className="flex-grow text-xs px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50 disabled:bg-gray-100 text-gray-800"
+                className="flex-grow text-base sm:text-xs px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-gray-50 disabled:bg-gray-100 text-gray-800"
                 maxLength={400}
                 required
               />
