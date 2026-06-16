@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   collection,
   query,
@@ -279,20 +279,14 @@ export default function App() {
     }
   };
 
-  // Database cleanup to remove previously seeded/fake data
+  // Database cleanup to remove previously seeded/fake data and make sure they never return
   useEffect(() => {
     const runCleanup = async () => {
-      const alreadyCleaned = localStorage.getItem('fb_portfolio_cleaned_v3');
-      if (alreadyCleaned === 'true') return;
-
       try {
         const projects = ['project-1', 'project-2', 'project-3'];
         for (const pid of projects) {
           const postRef = doc(db, 'posts', pid);
-          await updateDoc(postRef, {
-            likesCount: 0,
-            likedBy: []
-          }).catch(() => {});
+          await deleteDoc(postRef).catch(() => {});
 
           // Delete pre-seeded comments
           const idxs = [0, 1];
@@ -301,7 +295,6 @@ export default function App() {
             await deleteDoc(commentRef).catch(() => {});
           }
         }
-        localStorage.setItem('fb_portfolio_cleaned_v3', 'true');
       } catch (err) {
         console.warn("Cleanup warning: ", err);
       }
@@ -378,43 +371,50 @@ export default function App() {
   const [passcodeError, setPasscodeError] = useState<string | null>(null);
   const [showPasscodeForm, setShowPasscodeForm] = useState<boolean>(false);
 
+  // Keep latest profile in a ref to avoid stale closures in real-time callbacks
+  const profileRefValue = useRef(profile);
+  useEffect(() => {
+    profileRefValue.current = profile;
+  }, [profile]);
+
   // Real-time synchronization of the developer's profile from Firestore
   useEffect(() => {
     const profileRef = doc(db, 'profiles', 'melmar');
     const unsubscribe = onSnapshot(profileRef, (snapshot) => {
+      const current = profileRefValue.current;
       if (snapshot.exists()) {
         const data = snapshot.data();
         const updatedProfile: UserProfile = {
-          name: data.name || 'Melmar Jones Velasco',
-          role: data.role || 'Aspiring Full-Stack Developer',
-          company: data.company || 'Hands-On Learning & AI Innovation',
-          location: data.location || 'Alcala, Pangasinan, PH',
-          bio: data.bio || 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
-          avatar: data.avatar || '/profile/melmar.jpg',
-          coverPhoto: data.coverPhoto || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-          github: data.github || 'https://github.com/melmarj0nes23',
-          linkedin: data.linkedin || 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
-          facebook: data.facebook || 'https://facebook.com/melmarj0nes23',
-          email: data.email || 'mailto:melmarjvelasco@gmail.com',
-          skills: data.skills || ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
+          name: data.name || current.name || 'Melmar Jones Velasco',
+          role: data.role || current.role || 'Aspiring Full-Stack Developer',
+          company: data.company || current.company || 'Hands-On Learning & AI Innovation',
+          location: data.location || current.location || 'Alcala, Pangasinan, PH',
+          bio: data.bio || current.bio || 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
+          avatar: data.avatar || current.avatar || '/profile/melmar.jpg',
+          coverPhoto: data.coverPhoto || current.coverPhoto || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          github: data.github || current.github || 'https://github.com/melmarj0nes23',
+          linkedin: data.linkedin || current.linkedin || 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
+          facebook: data.facebook || current.facebook || 'https://facebook.com/melmarj0nes23',
+          email: data.email || current.email || 'mailto:melmarjvelasco@gmail.com',
+          skills: data.skills || current.skills || ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
         };
         setProfile(updatedProfile);
         localStorage.setItem('fb_portfolio_profile', JSON.stringify(updatedProfile));
       } else {
-        // Seed default profile to Firestore if not present yet
+        // Seed default profile to Firestore if not present yet, referencing existing local metadata
         const defaultProfile = {
-          name: 'Melmar Jones Velasco',
-          role: 'Aspiring Full-Stack Developer',
-          company: 'Hands-On Learning & AI Innovation',
-          location: 'Alcala, Pangasinan, PH',
-          bio: 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
-          avatar: '/profile/melmar.jpg',
-          coverPhoto: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-          github: 'https://github.com/melmarj0nes23',
-          linkedin: 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
-          facebook: 'https://facebook.com/melmarj0nes23',
-          email: 'mailto:melmarjvelasco@gmail.com',
-          skills: ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
+          name: current.name || 'Melmar Jones Velasco',
+          role: current.role || 'Aspiring Full-Stack Developer',
+          company: current.company || 'Hands-On Learning & AI Innovation',
+          location: current.location || 'Alcala, Pangasinan, PH',
+          bio: current.bio || 'Aspiring full stack developer passionate about building clean, functional, and user-friendly web apps using AI as a fast development partner.',
+          avatar: current.avatar || '/profile/melmar.jpg',
+          coverPhoto: current.coverPhoto || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+          github: current.github || 'https://github.com/melmarj0nes23',
+          linkedin: current.linkedin || 'https://ph.linkedin.com/in/melmar-jones-velasco-5b795a340',
+          facebook: current.facebook || 'https://facebook.com/melmarj0nes23',
+          email: current.email || 'mailto:melmarjvelasco@gmail.com',
+          skills: current.skills || ['React', 'TypeScript', 'Tailwind CSS', 'Firebase', 'Node.js', 'PostgreSQL', 'Vite', 'Python', 'AI Prompting']
         };
         setDoc(profileRef, defaultProfile).catch((err) => {
           console.warn("Could not seed default profile to Firestore:", err);
@@ -479,39 +479,9 @@ export default function App() {
 
     const unsubscribe = onSnapshot(postsQuery, async (snapshot) => {
       if (snapshot.empty) {
-        // Check if we have already seeded or if user manually cleared posts
-        if (localStorage.getItem('fb_portfolio_seeded') === 'true') {
-          setPosts([]);
-          setIsLoading(false);
-          return;
-        }
-
-        // Deep cross-device verification to check if seeded is recorded in profile
-        try {
-          const { getDoc } = await import('firebase/firestore');
-          const pDoc = await getDoc(doc(db, 'profiles', 'melmar'));
-          if (pDoc.exists() && pDoc.data()?.seeded === true) {
-            localStorage.setItem('fb_portfolio_seeded', 'true');
-            setPosts([]);
-            setIsLoading(false);
-            return;
-          }
-        } catch (e) {
-          console.warn("Cross-device seeding guard fetch warning:", e);
-        }
-
-        // Seed initial 3 mock posts dynamically to satisfy target specs
-        setIsLoading(true);
-        try {
-          await seedInitialMockData();
-        } catch (err) {
-          console.error("Seeding error:", err);
-        }
+        setPosts([]);
         setIsLoading(false);
         return;
-      } else {
-        // Since we have active posts, store that we are seeded so we don't re-seed on deletions
-        localStorage.setItem('fb_portfolio_seeded', 'true');
       }
 
       const loadedPosts: Post[] = snapshot.docs.map(doc => ({
@@ -557,51 +527,7 @@ export default function App() {
     };
   }, [posts]);
 
-  // Seeding initial portfolio content
-  const seedInitialMockData = async () => {
-    const mockPosts = [
-      {
-        id: 'project-1',
-        title: 'DevForge Social — Open Source Dev Hub',
-        description: 'Super excited to present my latest main project! DevForge Social is a high-fidelity collaboration hub built for open-source teams. Featuring dynamic commit feeds, visual progress bento-grids, and interactive task assignment pipelines, it matches active agile pipelines into a single beautiful feed.\n\nBackend scale configured with Redis caching and isolated SSE socket pools.',
-        tags: ['React', 'TypeScript', 'Node.js', 'Redis', 'WebSockets'],
-        likesCount: 0,
-        likedBy: [],
-        imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80',
-        createdAt: serverTimestamp()
-      },
-      {
-        id: 'project-2',
-        title: 'NebulaDB — Low Latency Edge Data Engine',
-        description: 'NebulaDB is a relational transactional cache engine optimized for resource-limited IoT nodes. Written with safety in Rust and compiled to WebAssembly, it can run directly within sandboxed workers or edge regions.\n\nSuccessfully clocked 450k upsert transactions per second under virtual thread loads.',
-        tags: ['Rust', 'WebAssembly', 'EdgeComputing', 'IoT'],
-        likesCount: 0,
-        likedBy: [],
-        imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1000&q=80',
-        createdAt: serverTimestamp()
-      },
-      {
-        id: 'project-3',
-        title: 'AuraSound — Aesthetic AI Ambient Wave Generator',
-        description: 'Creating a highly polished frontend for focus. AuraSound hooks directly into ambient mood sensors to generate infinite non-repetitive synthesizer sounds matching your active background task. Utilizing React Motion loops, Web Audio APIs, and Gemini neural text analysis to curate appropriate visual theme decks.',
-        tags: ['NextJS', 'TailwindCSS', 'WebAudio', 'Gemini'],
-        likesCount: 0,
-        likedBy: [],
-        imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1000&q=80',
-        createdAt: serverTimestamp()
-      }
-    ];
-
-    for (const mock of mockPosts) {
-      const { id, ...postData } = mock;
-      const docRef = doc(db, 'posts', id);
-      await setDoc(docRef, postData);
-    }
-
-    // Set seeded flag so we never auto-seed again
-    localStorage.setItem('fb_portfolio_seeded', 'true');
-    await setDoc(doc(db, 'profiles', 'melmar'), { seeded: true }, { merge: true }).catch(() => {});
-  };
+  // Seeding initial portfolio content has been completely disabled to remove fake placeholders
 
   // Add a new project post
   const handleAddPost = async (title: string, description: string, tags: string[], imageUrl?: string, imageUrls?: string[]) => {

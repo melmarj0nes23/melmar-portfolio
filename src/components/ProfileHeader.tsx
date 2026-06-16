@@ -34,6 +34,23 @@ export default function ProfileHeader({
   const [isMessageMenuOpen, setIsMessageMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Synchronize local inputs when parent profile state changes from database sync
+  useEffect(() => {
+    setEditedBio(profile.bio);
+  }, [profile.bio]);
+
+  useEffect(() => {
+    setEditedName(profile.name);
+  }, [profile.name]);
+
+  useEffect(() => {
+    setAvatarUrlInput(profile.avatar);
+  }, [profile.avatar]);
+
+  useEffect(() => {
+    setCoverUrlInput(profile.coverPhoto);
+  }, [profile.coverPhoto]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
