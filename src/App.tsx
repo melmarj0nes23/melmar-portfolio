@@ -15,11 +15,10 @@ import { db } from './firebase';
 import { Post, Comment, UserProfile } from './types';
 import Header from './components/Header';
 import ProfileHeader from './components/ProfileHeader';
-import AIChatBot from './components/AIChatBot';
 import IntroSidebar from './components/IntroSidebar';
 import CreatePost from './components/CreatePost';
 import PostCard from './components/PostCard';
-import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, ArrowUp, Sparkles, Code2, Wifi, Battery, RotateCw, Laptop, Smartphone } from 'lucide-react';
+import { Lock, Unlock, Key, ShieldCheck, X, ChevronLeft, ChevronRight, Sparkles, Code2, Wifi, Battery, RotateCw, Laptop, Smartphone, ArrowUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Enums and Interfaces required by Firebase Integration Skill for Error Diagnostics
@@ -188,6 +187,8 @@ export default function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+
 
   // Swipe and zoom states for mobile activeLightbox modal
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -777,7 +778,6 @@ export default function App() {
           onUpdateName={handleUpdateName}
           onUpdateAvatar={handleUpdateAvatar}
           onUpdateCoverPhoto={handleUpdateCoverPhoto}
-          onOpenAIChat={() => window.dispatchEvent(new Event('open-ai-chat'))}
         />
 
         {/* Owner Verification Console - Hidden by default, toggled via Node.js badge or shown active */}
@@ -949,17 +949,9 @@ export default function App() {
         </div>
       </main>
 
-      {/* Visual Footer with Back to Top button */}
+      {/* Visual Footer */}
       <footer className="w-full bg-gray-100 border-t border-gray-200 py-8 px-4 mt-12 text-center text-xs text-gray-500 font-sans select-none flex flex-col items-center gap-2" id="portfolio-footer">
         <p className="font-semibold text-gray-650">Melmar Jones Velasco &copy; {new Date().getFullYear()}</p>
-        <button
-          onClick={scrollToTop}
-          className="mt-2.5 flex items-center gap-1.5 px-4 py-1.5 bg-white hover:bg-gray-50 border border-gray-250 text-gray-700 font-bold text-xs rounded-full transition-all active:scale-95 shadow-sm cursor-pointer hover:shadow"
-          title="Return to the top of the page"
-        >
-          <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
-          Back to Top
-        </button>
       </footer>
 
       {/* Dynamic Photo Lightbox Modal rendered at root level to prevent stacking context overlaps */}
@@ -1197,8 +1189,23 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Modern AI ChatBot Widget */}
-      <AIChatBot profile={profile} posts={posts} />
+      {/* Persistent Floating Back to Top Button on Mobile */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 15 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            onClick={scrollToTop}
+            className="md:hidden fixed bottom-6 right-6 p-3 bg-[#4f46e5]/95 hover:bg-[#4338ca] text-white rounded-full shadow-lg border border-indigo-400/20 backdrop-blur-sm z-[999] active:scale-90 transition-transform flex items-center justify-center cursor-pointer shadow-indigo-500/10"
+            aria-label="Back to Top"
+            title="Scroll to Top"
+          >
+            <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
