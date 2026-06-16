@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Edit2, Check, X, ArrowUpRight, Facebook, Mail, ChevronDown, Github, Linkedin, MessageSquare, ExternalLink } from 'lucide-react';
+import { Camera, Edit2, Check, X, ArrowUpRight, Facebook, Mail, ChevronDown, Github, Linkedin, MessageSquare, ExternalLink, Sparkles } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface ProfileHeaderProps {
@@ -9,6 +9,7 @@ interface ProfileHeaderProps {
   onUpdateName: (newName: string) => void;
   onUpdateAvatar?: (url: string) => void;
   onUpdateCoverPhoto?: (url: string) => void;
+  onOpenAIChat?: () => void;
 }
 
 export default function ProfileHeader({
@@ -17,7 +18,8 @@ export default function ProfileHeader({
   onUpdateBio,
   onUpdateName,
   onUpdateAvatar,
-  onUpdateCoverPhoto
+  onUpdateCoverPhoto,
+  onOpenAIChat
 }: ProfileHeaderProps) {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(profile.bio);
@@ -293,6 +295,23 @@ export default function ProfileHeader({
                 <div className="px-3.5 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-1.5 mb-1 select-none">
                   Choose an action
                 </div>
+
+                {/* Chat with Joshua AI Assistant */}
+                {onOpenAIChat && (
+                  <button
+                    onClick={() => {
+                      onOpenAIChat();
+                      setIsMessageMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-bold text-[#4f46e5] bg-indigo-50/40 hover:bg-indigo-50 border-b border-gray-150 transition-colors cursor-pointer text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse fill-indigo-100" />
+                      <span>Chat with Joshua (AI Assistant)</span>
+                    </div>
+                    <span className="text-[9px] bg-[#4f46e5] text-white font-bold px-1.5 py-0.5 rounded-full uppercase scale-90 tracking-wider">AI</span>
+                  </button>
+                )}
                 
                 {/* Follow on GitHub */}
                 <a
