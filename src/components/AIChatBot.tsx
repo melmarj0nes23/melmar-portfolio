@@ -60,6 +60,10 @@ export default function AIChatBot({ profile, posts }: AIChatBotProps) {
       setIsOpen(true);
     };
     window.addEventListener('open-ai-chat', handleOpenChat);
+
+    // Dynamic log to help debug API path resolution in remote deployments
+    console.log("[AI ChatBot Debug] Compiled VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL || "Relative /api/chat");
+
     return () => {
       window.removeEventListener('open-ai-chat', handleOpenChat);
     };
