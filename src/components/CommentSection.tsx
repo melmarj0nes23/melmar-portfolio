@@ -14,7 +14,8 @@ interface CommentSectionProps {
 export default function CommentSection({ comments, isSubmitting, onAddComment, onDeleteComment, visitorAvatar, isOwner = false }: CommentSectionProps) {
   const [inputText, setInputText] = useState('');
   const [visitorName, setVisitorName] = useState(() => {
-    return localStorage.getItem('fb_portfolio_commenter_name') || '';
+    const saved = localStorage.getItem('fb_portfolio_commenter_name') || '';
+    return saved.replace(/[^a-zA-Z\s]/g, '');
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,8 +113,9 @@ export default function CommentSection({ comments, isSubmitting, onAddComment, o
             value={visitorName}
             onChange={(e) => {
               const val = e.target.value;
-              setVisitorName(val);
-              localStorage.setItem('fb_portfolio_commenter_name', val);
+              const filteredVal = val.replace(/[^a-zA-Z\s]/g, '');
+              setVisitorName(filteredVal);
+              localStorage.setItem('fb_portfolio_commenter_name', filteredVal);
             }}
             required
             className="bg-white border border-gray-300 rounded-md py-1 px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#4f46e5] font-semibold text-gray-850 w-full sm:max-w-[180px]"
